@@ -8,10 +8,29 @@ float modulo_naive(float a, int p){
     a mod p = frac(a) + (int(a) % p)
     */
     int int_part = ((int) a) % p;
-    printf("Integer part of %f = %d \n", a, int_part);
     float frac_part = a - (float)(int) a;
+    printf("Integer part of %f = %d \n", a, int_part);
     printf("Fractional part of %f = %f \n", a, frac_part);
     return frac_part + int_part;
+
+}
+
+float modulo_SIMD1(float a, int p){
+    // Function 3.1 of SIMD article
+    float u = 1.0 / p;
+    float b = a * u;
+    int c = (int) b;
+
+    float d = a - c * p;
+    if (d >= p) return d-p;
+    if (d < 0) return d+p;
+
+    printf("u = %f\n", u);
+    printf("b = %f\n", b);
+    printf("c = %d\n", c);
+    printf("d = %f\n", d);
+    printf("c*p = %d * %d = %d\n", c, p, c*p);
+    return d;
 }
 
 

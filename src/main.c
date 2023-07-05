@@ -118,7 +118,7 @@ int main(){
     // benchmark_loops_order("benchmark_loops_order.txt");
 
     int p = (int) pow(2, 26) - 5;
-    int n = 2;
+    // int n = 2;
     // printf("Single test\n");
     // float**A = random_matrix(n, p);
     // float**B = random_matrix(n, p);
@@ -130,8 +130,24 @@ int main(){
     // print_matrix(C, n);
 
     float a = 1024.2;
-    printf("%f mod %d = %f \n", a, p, modulo_naive(a, p));
+    int pp = 1000;
+    printf("Testing %f mod %d\n", a, pp);
+    printf("\n");
+    printf("modulo_naive returns: %f\n", modulo_naive(a, pp));
+    printf("\n");
+    printf("modulo_SIMD1 returns: %f\n", modulo_SIMD1(a, pp));
+    printf("\n");
 
+    float b = 67108864.2;
+    printf("Testing %f mod %d\n", b, p);
+    printf("\n");
+    printf("modulo_naive returns: %f\n", modulo_naive(b, p));
+    printf("\n");
+    printf("modulo_SIMD1 returns: %f\n", modulo_SIMD1(b, p));
+    printf("\n");
 
+    // printf("Division between floats\n");
+    // float u = 1.0/(3.0);
+    // printf("%f\n\n", u);
     return 0;
 }

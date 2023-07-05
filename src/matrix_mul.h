@@ -4,6 +4,8 @@
 #include "matrix.h"
 
 float modulo_naive(float a, int p);
+float modulo_SIMD1(float a, int p);
+
 void mp_naive(float** A, float** B, float** C, int n, int p);
 
 void mp_ijk(float** A, float** B, float** C, int n);
