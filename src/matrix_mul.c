@@ -2,55 +2,70 @@
 #include <stdlib.h>
 
 
-float modulo_naive(float a, int p){
+double modulo_naive(double a, double p){
 
     /* Return a % p
     a mod p = frac(a) + (int(a) % p)
     */
-    int int_part = ((int) a) % p;
-    float frac_part = a - (float)(int) a;
+    int int_part = ((int) a) % ((int) p);
+    double frac_part = a - (double)(int) a;
     printf("Integer part of %f = %d \n", a, int_part);
     printf("Fractional part of %f = %f \n", a, frac_part);
     return frac_part + int_part;
 
 }
 
-float modulo_SIMD1(float a, int p){
+double modulo_SIMD1(double a, double p, double u){
     // Function 3.1 of SIMD article
-    float u = 1.0 / p;
-    float b = a * u;
+    // double u = 1.0 / p;
+    double b = a * u;
+    // double c = b;
     int c = (int) b;
 
-    float d = a - c * p;
+    double d = a - c * p;
     if (d >= p) return d-p;
     if (d < 0) return d+p;
 
-    printf("u = %f\n", u);
-    printf("b = %f\n", b);
-    printf("c = %d\n", c);
-    printf("d = %f\n", d);
-    printf("c*p = %d * %d = %d\n", c, p, c*p);
+    // printf("u = %f\n", u);
+    // printf("b = %f\n", b);
+    // printf("c = %d\n", c);
+    // printf("d = %f\n", d);
+    // printf("c*p = %d * %d = %d\n", c, p, c*p);
     return d;
 }
 
 
-void mp_naive(float** A, float** B, float** C, int n, int p){
+void mp_naive(double** A, double** B, double** C, int n, double p){
     // Assert C is a zero matrix
     for (int i=0; i<n; i++){
         for (int j=0; j<n; j++){
             for (int k=0; k<n; k++){
-                C[i][j] += A[i][k] * B[k][j];
-                C[i][j] = modulo_naive(C[i][j], p);
+                double temp = modulo_naive(A[i][k] * B[k][j], p);
+                C[i][j] = modulo_naive(C[i][j] + temp, p);
             }
         }
     }
+}
+
+void mp_SIMD1(double** A, double** B, double** C, int n, double p, double u){
+    // Assert C is a zero matrix
+    for (int i=0; i<n; i++){
+        for (int j=0; j<n; j++){
+            for (int k=0; k<n; k++){
+                double temp = modulo_SIMD1(A[i][k] * B[k][j], p, u);
+                C[i][j] = modulo_SIMD1(C[i][j] + temp, p, u);
+                // 2 modulos
+            }
+        }
+    }
+
 }
 
 
 // Comparing loop order. KIJ wins.
 
 // Loop 1
-void mp_ijk(float** A, float** B, float** C, int n){
+void mp_ijk(double** A, double** B, double** C, int n){
     // Assert C is a zero matrix
     for (int i=0; i<n; i++){
         for (int j=0; j<n; j++){
@@ -63,7 +78,7 @@ void mp_ijk(float** A, float** B, float** C, int n){
 
 
 // Loop 2
-void mp_kij(float** A, float** B, float** C, int n){
+void mp_kij(double** A, double** B, double** C, int n){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
         for (int i=0; i<n; i++){
@@ -76,7 +91,7 @@ void mp_kij(float** A, float** B, float** C, int n){
 
 
 // Loop 3
-void mp_jki(float** A, float** B, float** C, int n){
+void mp_jki(double** A, double** B, double** C, int n){
     // Assert C is a zero matrix
     for (int j=0; j<n; j++){
         for (int k=0; k<n; k++){
@@ -88,7 +103,7 @@ void mp_jki(float** A, float** B, float** C, int n){
 }
 
 // Loop 4
-void mp_ikj(float** A, float** B, float** C, int n){
+void mp_ikj(double** A, double** B, double** C, int n){
     // Assert C is a zero matrix
     for (int i=0; i<n; i++){
         for (int k=0; k<n; k++){
@@ -100,7 +115,7 @@ void mp_ikj(float** A, float** B, float** C, int n){
 }
 
 // Loop 5
-void mp_jik(float** A, float** B, float** C, int n){
+void mp_jik(double** A, double** B, double** C, int n){
     // Assert C is a zero matrix
     for (int j=0; j<n; j++){
         for (int i=0; i<n; i++){
@@ -112,7 +127,7 @@ void mp_jik(float** A, float** B, float** C, int n){
 }
 
 // Loop 6
-void mp_kji(float** A, float** B, float** C, int n){
+void mp_kji(double** A, double** B, double** C, int n){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
         for (int j=0; j<n; j++){

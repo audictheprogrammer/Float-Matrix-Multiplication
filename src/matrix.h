@@ -7,14 +7,14 @@
 #include <string.h>
 
 // Basic operations
-float** zero_matrix(int size);
-float** random_matrix(int size, int p);
-void delete_matrix(float*** mat, int size);
-float** transpose_matrix(float** mat, int size);
-void print_matrix(float** mat, int size);
-void write_matrix(u_int64_t** mat, int size, char* filename);
-u_int64_t** read_matrix(char* filename, int* size);
-int equals_matrix(u_int64_t** A, u_int64_t** B, int size);
+double** zero_matrix(int size);
+double** random_matrix(int size, double p);
+void delete_matrix(double*** mat, int size);
+double** transpose_matrix(double** mat, int size);
+void print_matrix(double** mat, int size);
+void write_matrix(double** mat, int size, char* filename);
+double** read_matrix(char* filename, int* size);
+int equals_matrix(double** A, double** B, int size);
 int equals_matrix_file(char* filename1, char* filename2);
 
 
