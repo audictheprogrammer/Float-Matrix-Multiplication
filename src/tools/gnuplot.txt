@@ -11,15 +11,14 @@ set style line 2 lc rgb '#0060ff' lt 1 lw 2 pt 7 pi -1 ps 1.5
 set style line 3 lc rgb '#60ad00' lt 1 lw 2 pt 7 pi -1 ps 1.5
 set style line 4 lc rgb '#60ff00' lt 1 lw 2 pt 7 pi -1 ps 1.5
 set style line 5 lc rgb '#ad00ff' lt 1 lw 2 pt 7 pi -1 ps 1.5
-set style line 6 lc rgb '#ad33ff' lt 1 lw 2 pt 7 pi -1 ps 1.5
+set style line 6 lc rgb '#ff00ff' lt 1 lw 2 pt 7 pi -1 ps 1.5
 set pointintervalbox 3
 
-set yr [GPVAL_DATA_Y_MIN + 10:GPVAL_DATA_Y_MAX-10]
-plot "../data/benchmark_ijk.txt" using 1:2 title "IJK" with linespoints ls 1
-replot "../data/benchmark_ikj.txt" using 1:2 title "IKJ" with linespoints ls 2
-replot "../data/benchmark_jik.txt" using 1:2 title "JIK" with linespoints ls 3
-replot "../data/benchmark_jki.txt" using 1:2 title "JKI" with linespoints ls 4
-replot "../data/benchmark_kij.txt" using 1:2 title "KIJ" with linespoints ls 5
-replot "../data/benchmark_kji.txt" using 1:2 title "KJI" with linespoints ls 6
+plot "../data/benchmark_order_ijk.txt" using 1:2 title "IJK" with linespoints ls 1
+replot "../data/benchmark_order_ikj.txt" using 1:2 title "IKJ" with linespoints ls 2
+replot "../data/benchmark_order_jik.txt" using 1:2 title "JIK" with linespoints ls 3
+replot "../data/benchmark_order_jki.txt" using 1:2 title "JKI" with linespoints ls 4
+replot "../data/benchmark_order_kij.txt" using 1:2 title "KIJ" with linespoints ls 5
+replot "../data/benchmark_order_kji.txt" using 1:2 title "KJI" with linespoints ls 6
 
 # Graphe Order of loops

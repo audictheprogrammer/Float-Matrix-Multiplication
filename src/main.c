@@ -3,7 +3,7 @@
 #include <math.h>
 
 void benchmark_ijk(double** A, double** B, int n){
-    FILE* f = fopen("data/benchmark_ijk.txt", "a");
+    FILE* f = fopen("data/benchmark_order_ijk.txt", "a");
     double** C = zero_matrix(n);
 
     clock_t initial = clock();
@@ -18,7 +18,7 @@ void benchmark_ijk(double** A, double** B, int n){
 }
 
 void benchmark_kij(double** A, double** B, int n){
-    FILE* f = fopen("data/benchmark_kij.txt", "a");
+    FILE* f = fopen("data/benchmark_order_kij.txt", "a");
     double** C = zero_matrix(n);
 
     clock_t initial = clock();
@@ -33,7 +33,7 @@ void benchmark_kij(double** A, double** B, int n){
 }
 
 void benchmark_jki(double** A, double** B, int n){
-    FILE* f = fopen("data/benchmark_jki.txt", "a");
+    FILE* f = fopen("data/benchmark_order_jki.txt", "a");
     double** C = zero_matrix(n);
 
     clock_t initial = clock();
@@ -48,7 +48,7 @@ void benchmark_jki(double** A, double** B, int n){
 }
 
 void benchmark_ikj(double** A, double** B, int n){
-    FILE* f = fopen("data/benchmark_ikj.txt", "a");
+    FILE* f = fopen("data/benchmark_order_ikj.txt", "a");
     double** C = zero_matrix(n);
 
     clock_t initial = clock();
@@ -63,7 +63,7 @@ void benchmark_ikj(double** A, double** B, int n){
 }
 
 void benchmark_jik(double** A, double** B, int n){
-    FILE* f = fopen("data/benchmark_jik.txt", "a");
+    FILE* f = fopen("data/benchmark_order_jik.txt", "a");
     double** C = zero_matrix(n);
 
     clock_t initial = clock();
@@ -78,7 +78,7 @@ void benchmark_jik(double** A, double** B, int n){
 }
 
 void benchmark_kji(double** A, double** B, int n){
-    FILE* f = fopen("data/benchmark_kji.txt", "a");
+    FILE* f = fopen("data/benchmark_order_kji.txt", "a");
     double** C = zero_matrix(n);
 
     clock_t initial = clock();
@@ -98,7 +98,6 @@ void benchmark_loops_order(double p){
         int n = (int) pow(2, i);
         double**A = random_matrix(n, p);
         double**B = random_matrix(n, p);
-        double**C = zero_matrix(n);
         benchmark_ijk(A, B, n);
         benchmark_kij(A, B, n);
         benchmark_jki(A, B, n);
@@ -108,6 +107,37 @@ void benchmark_loops_order(double p){
     }
 }
 
+// void benchmark_mod_naive(double** A, double** B, int n){
+//     FILE* f = fopen("data/benchmark_kji.txt", "a");
+//     double** C = zero_matrix(n);
+//
+//     clock_t initial = clock();
+//     mp_kji(A, B, C, n);
+//     clock_t final = clock();
+//
+//     double time = ((double) (final - initial)) / CLOCKS_PER_SEC;
+//     printf("KJI: n = %d time = %f \n\n", n, time);
+//     fprintf(f, "%d %f \n", n, time);
+//
+//     fclose(f);
+// }
+
+void benchmark_modulos(double p, double u){
+
+    // for (int i=8; i<11; i++){
+    //     int n = (int) pow(2, i);
+    //     double**A = random_matrix(n, p);
+    //     double**B = random_matrix(n, p);
+    //     benchmark_mod_naive(A, B, n);
+    //     benchmark_mod_SIMD1(A, B, n);
+    //     benchmark_mod_SIMD2(A, B, n);
+    //     benchmark_mod_SIMD3(A, B, n);
+    //     benchmark_mod_barrett(A, B, n);
+    //
+    // }
+}
+
+
 
 
 int main(){
@@ -115,32 +145,13 @@ int main(){
     srand(time(NULL));
     double p = pow(2, 26) - 5;
     double u = 1.0 / p;  // u = inv(p)
+    u_int32_t u_b = (int) (pow(2, 36) / p);
 
-    Testing loops order
-    benchmark_loops_order(p);
+    // // Testing loops order
+    // benchmark_loops_order(p);
 
-    // int n = 2;
-    // printf("Single test\n");
-    // double**A = random_matrix(n, p);
-    // double**B = random_matrix(n, p);
-    // double**C = zero_matrix(n);
-    // double**D = zero_matrix(n);
-    // mp_naive(A, B, C, n, p);
-    // mp_SIMD1(A, B, D, n, p, u);
-    //
-    // print_matrix(A, n);
-    // print_matrix(B, n);
-    // printf("Matrix C = \n");
-    // print_matrix(C, n);
-    //
-    // printf("Matrix D = \n");
-    // print_matrix(D, n);
-
-    // Testing mp_SIMD1
-    // double a = pow(2, 25);
-    // double reminder = modulo_SIMD1(a, p, u);
-    // printf("a = %f\n", a);
-    // printf("reminder = %f\n", reminder);
+    // Testing different modulo
+    // benchmark_modulos(p, u);
 
 
     return 0;

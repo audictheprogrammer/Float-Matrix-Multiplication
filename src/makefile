@@ -1,5 +1,5 @@
 # Targets
-all:ain
+all: main main_test
 
 # Headers
 matrix.o: matrix.c
@@ -10,7 +10,9 @@ matrix_mul.o: matrix_mul.c
 # Mains
 main: main.c matrix.o matrix_mul.o
 	gcc -o main main.c matrix.o matrix_mul.o -lm
+main_test: main_test.c matrix.o matrix_mul.o
+	gcc -o main_test main_test.c matrix.o matrix_mul.o -lm
 
 clean:
 	rm *.o
-	rm -rf main
+	rm -rf main main_test
