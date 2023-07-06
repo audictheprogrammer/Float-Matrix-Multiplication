@@ -20,11 +20,10 @@
 // }
 
 int main(int argc, char** argv){
-    const int TEST1 = 1;
-    const int TEST2 = 1;
-    const int TEST3 = 1;
-
-    const int TEST4 = 0;
+    const int TEST1 = 0;
+    const int TEST2 = 0;
+    const int TEST3 = 0;
+    const int TEST4 = 1;
     // const int TEST5 = 0;
     // const int TEST6 = 0;
     // const int TEST7 = 1;
@@ -107,7 +106,7 @@ int main(int argc, char** argv){
         double p = pow(2, 26) - 5;
         double u = 1.0 / p;
         int n = 2;
-        double**A = random_matrix(n, p);
+        double**A = read_matrix("data/Matrix_A.txt", &n);
         double**B = random_matrix(n, p);
         double**C = zero_matrix(n);  // Naive
         double**D = zero_matrix(n);  // SIMD1
@@ -119,6 +118,7 @@ int main(int argc, char** argv){
         mp_SIMD2(A, B, E, n, p, u);
         mp_SIMD3(A, B, F, n, p, u);
 
+        // write_matrix(A, n, "data/Matrix_A.txt");
         printf("Matrix A = \n");
         print_matrix(A, n);
         printf("Matrix B = \n");
