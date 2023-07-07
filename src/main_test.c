@@ -34,7 +34,7 @@ int main(int argc, char** argv){
         double p = pow(2, 26) - 5;
         double u = 1.0 / p;
         double a = pow(2, 26);
-        u_int32_t u_b = (int) (pow(2, 56) / p);
+        u_int32_t u_b = (int) (pow(2, 56) / p);  // Needed for Barrett
 
         double SIMD1 = modulo_SIMD1(a, p, u);
         double SIMD2 = modulo_SIMD2(a, p, u);
@@ -105,8 +105,9 @@ int main(int argc, char** argv){
         fesetround(FE_DOWNWARD);
         double p = pow(2, 26) - 5;
         double u = 1.0 / p;
+        double overline_u = rint(1.0 / p);
         int n = 2;
-        double**A = read_matrix("data/Matrix_A.txt", &n);
+        double**A = random_matrix(n, p);
         double**B = random_matrix(n, p);
         double**C = zero_matrix(n);  // Naive
         double**D = zero_matrix(n);  // SIMD1
@@ -115,10 +116,13 @@ int main(int argc, char** argv){
 
         mp_naive(A, B, C, n, p);
         mp_SIMD1(A, B, D, n, p, u);
-        mp_SIMD2(A, B, E, n, p, u);
-        mp_SIMD3(A, B, F, n, p, u);
+        mp_SIMD2(A, B, E, n, p, overline_u);
+        mp_SIMD3(A, B, F, n, p, overline_u);
 
-        // write_matrix(A, n, "data/Matrix_A.txt");
+        write_matrix(A, n, "data/Matrix_A.txt");
+        write_matrix(B, n, "data/Matrix_B.txt");
+        write_matrix(C, n, "data/Matrix_C.txt");
+
         printf("Matrix A = \n");
         print_matrix(A, n);
         printf("Matrix B = \n");

@@ -28,7 +28,7 @@ double modulo_SIMD2(double a, double p, double u){
     Hypothesis: Rounding mode = up and p < 2^26.
     */
     double b = a * u;
-    double c = rint(b);  //  The lib fenv.h has function double rint(double d)
+    double c = (double)(int)b;
     double d = a - c * p;
     if (d < 0) return d+p;
     return d;
@@ -39,7 +39,7 @@ double modulo_SIMD3(double a, double p, double u){
     Hypothesis: Rounding mode = up and p < 2^26.
     */
     double b = a * u;
-    double c = rint(b);
+    double c = (double)(int)b;
     // The lib fenv.h has a function
     // double rint(double d)
     double d = a - c * p;
