@@ -144,7 +144,7 @@ void benchmark_loops_order(double p){
     }
 }
 
-void benchmark_modulos(double p, double u){
+void benchmark_modulos(double p, double u, double u_overline){
     /* Benchmarking different modulos.
     The most efficient one is IKJ.
     */
@@ -161,8 +161,8 @@ void benchmark_modulos(double p, double u){
             double**B = random_matrix(n, p);
             sum_mod_naive += benchmark_mod_naive(A, B, n, p);
             sum_mod_SIMD1 += benchmark_mod_SIMD1(A, B, n, p, u);
-            sum_mod_SIMD2 += benchmark_mod_SIMD2(A, B, n, p, u);
-            sum_mod_SIMD3 += benchmark_mod_SIMD3(A, B, n, p, u);
+            sum_mod_SIMD2 += benchmark_mod_SIMD2(A, B, n, p, u_overline);
+            sum_mod_SIMD3 += benchmark_mod_SIMD3(A, B, n, p, u_overline);
         }
 
         printf("\n");
@@ -199,9 +199,11 @@ void clean_file_modulos(){
 int main(){
     // Initialization
     srand(time(NULL));
+    fesetround(FE_DOWNWARD);
     double p = pow(2, 26) - 5;
-    double u = 1.0 / p;  // u = inv(p)
-    u_int32_t u_b = (int) (pow(2, 36) / p);
+    double u = 1.0 / p;
+    double u_overline = rint(1.0 / p);
+    u_int32_t u_b = (int) (pow(2, 36) / p);  // Needed for Barrett
 
 
     // // // Testing loops order
@@ -211,7 +213,7 @@ int main(){
 
     // Testing different modulo
     clean_file_modulos();
-    benchmark_modulos(p, u);
+    benchmark_modulos(p, u, u_overline);
 
 
     return 0;
