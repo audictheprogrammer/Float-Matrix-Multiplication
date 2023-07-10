@@ -109,6 +109,17 @@ double benchmark_mod_SIMD2(double** A, double** B, int n, double p, double u){
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
+double benchmark_mod_Barrett(double** A, double** B, int n, double p, double u){
+    double** C = zero_matrix(n);
+
+    clock_t initial = clock();
+    mp_Barrett(A, B, C, n, p, u);
+    clock_t final = clock();
+
+    return ((double) (final - initial)) / CLOCKS_PER_SEC;
+}
+
+
 void benchmark_loops_order(double p){
     /* Benchmarking the order of loops.
     The most efficient one is IKJ.
@@ -144,17 +155,18 @@ void benchmark_loops_order(double p){
     }
 }
 
-void benchmark_modulos(double p, double u, double u_overline){
+void benchmark_modulos(double p, double u, double u_overline, double u_b){
     /* Benchmarking different modulos.
     The most efficient one is IKJ.
     */
-    int m = 5;  // Executes m times each algo
+    int m = 1;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
         double sum_mod_naive = 0;
         double sum_mod_SIMD1 = 0;
         double sum_mod_SIMD2 = 0;
         double sum_mod_SIMD3 = 0;
+        double sum_mod_Barrett = 0;
 
         for (int j=0; j<m; j++){
             double**A = random_matrix(n, p);
@@ -163,6 +175,7 @@ void benchmark_modulos(double p, double u, double u_overline){
             sum_mod_SIMD1 += benchmark_mod_SIMD1(A, B, n, p, u);
             sum_mod_SIMD2 += benchmark_mod_SIMD2(A, B, n, p, u_overline);
             sum_mod_SIMD3 += benchmark_mod_SIMD3(A, B, n, p, u_overline);
+            sum_mod_Barrett += benchmark_mod_Barrett(A, B, n, p, u_b);
         }
 
         printf("\n");
@@ -170,6 +183,7 @@ void benchmark_modulos(double p, double u, double u_overline){
         write_benchmark_time("data/benchmark_modulo_SIMD1.txt", "Mod SIMD1", n, sum_mod_SIMD1/m);
         write_benchmark_time("data/benchmark_modulo_SIMD2.txt", "Mod SIMD2", n, sum_mod_SIMD2/m);
         write_benchmark_time("data/benchmark_modulo_SIMD3.txt", "Mod SIMD3", n, sum_mod_SIMD3/m);
+        write_benchmark_time("data/benchmark_modulo_Barrett.txt", "Mod Barrett", n, sum_mod_Barrett/m);
 
     }
 }
@@ -199,12 +213,14 @@ void clean_file_modulos(){
 int main(){
     // Initialization
     srand(time(NULL));
-    fesetround(FE_DOWNWARD);
     double p = pow(2, 26) - 5;
-    double u = 1.0 / p;
-    double u_overline = rint(1.0 / p);
-    u_int32_t u_b = (int) (pow(2, 36) / p);  // Needed for Barrett
 
+    // Precomputed constants for Modular functions
+    double u = 1.0 / p;  // Constant for SIMD
+    fesetround(FE_UPWARD);
+    double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
+    fesetround(FE_TONEAREST);
+    u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
 
     // // // Testing loops order
     // 07/07/23 13:27 I did a benchmark for 5
@@ -212,8 +228,9 @@ int main(){
     // benchmark_loops_order(p);
 
     // Testing different modulo
+    // 10/07/23 11:35 I did a benchmark for 1
     clean_file_modulos();
-    benchmark_modulos(p, u, u_overline);
+    benchmark_modulos(p, u, u_overline, u_b);
 
 
     return 0;
