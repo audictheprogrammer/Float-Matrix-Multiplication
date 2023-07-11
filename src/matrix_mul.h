@@ -18,6 +18,7 @@ void mp_SIMD1(double** A, double** B, double** C, int n, double p, double u);
 void mp_SIMD2(double** A, double** B, double** C, int n, double p, double u);
 void mp_SIMD3(double** A, double** B, double** C, int n, double p, double u);
 void mp_Barrett(double** A, double** B, double** C, int n, double p, u_int32_t u);
+void mp_block(double** A, double** B, double** C, int n, double p, int bitsize_p);
 
 void mp_ijk(double** A, double** B, double** C, int n);
 void mp_kij(double** A, double** B, double** C, int n);

@@ -166,6 +166,11 @@ void mp_Barrett(double** A, double** B, double** C, int n, double p, u_int32_t u
 
 }
 
+void mp_block(double** A, double** B, double** C, int n, double p, int bitsize_p);
+
+
+
+
 // Comparing loop order. IKJ wins.
 
 // Loop 1

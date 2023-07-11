@@ -159,7 +159,7 @@ void benchmark_modulos(double p, double u, double u_overline, double u_b){
     /* Benchmarking different modulos.
     The most efficient one is IKJ.
     */
-    int m = 2;  // Executes m times each algo
+    int m = 5;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
         double sum_mod_naive = 0;
