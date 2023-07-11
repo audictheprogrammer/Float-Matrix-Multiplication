@@ -19,6 +19,6 @@ replot "../data/benchmark_order_ikj.txt" using 1:2 title "No Mod" with linespoin
 replot "../data/benchmark_modulo_SIMD1.txt" using 1:2 title "SIMD1" with linespoints ls 3
 replot "../data/benchmark_modulo_SIMD2.txt" using 1:2 title "SIMD2" with linespoints ls 4
 replot "../data/benchmark_modulo_SIMD3.txt" using 1:2 title "SIMD3" with linespoints ls 5
-replot "../data/benchmark_modulo_Barrett.txt" using 1:2 title "Bararett" with linespoints ls 6
+# replot "../data/benchmark_modulo_Barrett.txt" using 1:2 title "Barrett" with linespoints ls 6
 
 # Graphe Order of loops

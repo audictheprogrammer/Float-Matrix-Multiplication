@@ -24,9 +24,9 @@ int main(int argc, char** argv){
     const int TEST1 = 0;
     const int TEST2 = 0;
     const int TEST3 = 0;
-    const int TEST4 = 0;
+    const int TEST4 = 1;
     const int TEST5 = 0;
-    const int TEST6 = 1;
+    // const int TEST6 = 0;
     // const int TEST7 = 1;
 
 
@@ -35,11 +35,11 @@ int main(int argc, char** argv){
         double p = pow(2, 26) - 5;
 
         // Precomputed constants for Modular functions
-        fesetround(FE_DOWNWARD);
+        fesetround(FE_TONEAREST);
         double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
-        fesetround(FE_DOWNWARD);
+        fesetround(FE_TONEAREST);
         u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
 
         double a = pow(2, 26);
@@ -64,11 +64,11 @@ int main(int argc, char** argv){
         double p = pow(2, 26) - 5;
 
         // Precomputed constants for Modular functions
-        fesetround(FE_DOWNWARD);
+        fesetround(FE_TONEAREST);
         double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
-        fesetround(FE_DOWNWARD);
+        fesetround(FE_TONEAREST);
         u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
 
         double a = (p-1) * (p-1) * 32;
@@ -93,11 +93,11 @@ int main(int argc, char** argv){
         double p = pow(2, 26) - 5;
 
         // Precomputed constants for Modular functions
-        fesetround(FE_DOWNWARD);
+        fesetround(FE_TONEAREST);
         double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
-        fesetround(FE_DOWNWARD);
+        fesetround(FE_TONEAREST);
         u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
 
         double a = (p-1) * (p-1) * 16;  // a > 2^(25+25+4) = 2^54
@@ -123,16 +123,16 @@ int main(int argc, char** argv){
         double p = pow(2, 26) - 5;
 
         // Precomputed constants for Modular functions
-        fesetround(FE_DOWNWARD);
+        fesetround(FE_TONEAREST);
         double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
-        fesetround(FE_DOWNWARD);
         u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
+        fesetround(FE_TONEAREST);
 
-        int n = 200;
+        int n = 1024;
 
-        for (int i=0; i<10; i++){
+        for (int i=0; i<1; i++){
 
             double**A = random_matrix(n, p);
             double**B = random_matrix(n, p);
@@ -163,6 +163,16 @@ int main(int argc, char** argv){
             int nb3 = equals_matrix(C, F, n);
             int nb4 = equals_matrix(C, G, n);
 
+            delete_matrix(&A, n);
+            delete_matrix(&B, n);
+            delete_matrix(&C, n);
+            delete_matrix(&D, n);
+            delete_matrix(&E, n);
+            delete_matrix(&F, n);
+            delete_matrix(&G, n);
+
+
+            printf("i=%d \n", i);
             assert(nb1==1);
             assert(nb2==1);
             assert(nb3==1);
@@ -177,49 +187,24 @@ int main(int argc, char** argv){
         /* Testing the equivalence between
         if (d < 0) return d+p; else return d;
         And
-        return d + p()
+        return d + (-(d<0) & (int)p)
+        And
+        return d + p * (d<0)
         */
 
         double d1 = -2;
         double d2 = 2;
         double p = 100.0;
 
-        double a = 1024.5;
-        double b = 0b1111111111111111111111111111111111111111111111111111111111111111;
-        double temp = b && a;
-
-        // 0b 1111 1111 ... 1111 for double = ...
-
-        double res1 = d1 + ((-(d1<0)) && p);
-        double res2 = d2 + ((-(d2<0)) && p);
+        double res1 = d1 + ((-(d1<0)) & (u_int64_t)p);
+        double res2 = d2 + ((-(d2<0)) & (u_int64_t)p);
+        double res3 = d1 + p * (d1<0);
+        double res4 = d2 + p * (d2<0);
 
         printf("res1 = %f \n", res1);
         printf("res2 = %f \n", res2);
-        printf("b = %f \n", b);
-        printf("temp = %f \n", temp);
-    }
-
-    if (TEST6){
-        /* Testing FE_DOWNWARD and FE_UPWARD */
-        double p = pow(2, 26) - 5;
-        // double u1 = (p-1) * (p-1) * (p-1);
-        double u1 = -(p-1) * (p-1) * (p-1) * 64;
-        fesetround(FE_DOWNWARD);
-        double u2 = -(p-1) * (p-1) * (p-1) * 64;
-        fesetround(FE_UPWARD);
-        double u3 = -(p-1) * (p-1) * (p-1) * 64;
-        fesetround(FE_TOWARDZERO);
-        double u4 = -(p-1) * (p-1) * (p-1) * 64;
-        fesetround(FE_TONEAREST);
-        double u5 = -(p-1) * (p-1) * (p-1) * 64;
-
-        printf("u1=%f \n", u1);
-        printf("u2=%f \n", u2);
-        printf("u3=%f \n", u3);
-        printf("u4=%f \n", u3);
-        printf("u5=%f \n", u3);
-
-
+        printf("res3 = %f \n", res3);
+        printf("res4 = %f \n", res4);
     }
 
     return 0;

@@ -1,5 +1,5 @@
 # Targets
-all: main main_test
+all: main main_test main_blas
 
 # Headers
 matrix.o: matrix.c
@@ -12,7 +12,9 @@ main: main.c matrix.o matrix_mul.o
 	gcc -o main main.c matrix.o matrix_mul.o -lm
 main_test: main_test.c matrix.o matrix_mul.o
 	gcc -o main_test main_test.c matrix.o matrix_mul.o -lm
+main_blas: main_blas.c
+	gcc -o main_blas main_blas.c -lopenblas
 
 clean:
 	rm *.o
-	rm -rf main main_test
+	rm -rf main main_test main_blas

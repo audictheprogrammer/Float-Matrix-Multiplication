@@ -40,11 +40,6 @@ double** random_matrix(int size, double p){
             // int rand_int = rand();
             // mat[i][j] = modulo_SIMD1(rand_int, p);
             mat[i][j] = (double) (rand() % ((int) p));
-
-            // mat[i][j] = (double)rand()/(double)(RAND_MAX/p);
-
-
-            // mat[i][j] = rand() % mod;
         }
     }
 

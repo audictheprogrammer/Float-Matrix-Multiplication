@@ -12,8 +12,18 @@ double modulo_SIMD1(double a, double p, double u){
     double b = a * u;
     double c = (double)(int)b;
     double d = a - c * p;
-    if (d >= p) return d-p;
-    if (d < 0) return d+p;
+    // if (d >= p) return d-p;
+    if (d >= p) {
+        printf("SIMD1: if1 \n");
+        return d-p;
+    }
+    // printf("SIMD1: if1 \n");
+    if (d < 0){
+        printf("SIMD2: if2 \n");
+        return d+p;
+    }
+
+    // if (d < 0) return d+p;
     return d;
 }
 
@@ -24,7 +34,11 @@ double modulo_SIMD2(double a, double p, double u){
     double b = a * u;
     double c = (double)(int)b;
     double d = a - c * p;
-    if (d < 0) return d+p;
+    // if (d < 0) return d+p;
+    if (d < 0){
+        printf("d < 0 \n");
+        return d+p;
+    }
     return d;
 }
 
@@ -35,7 +49,8 @@ double modulo_SIMD3(double a, double p, double u){
     double b = a * u;
     double c = (double)(int)b;
     double d = a - c * p;
-    return d + (-(d<0) && p);
+    // return d + (-(d<0) & (int64_t) p);
+    return d + p * (d<0);
 }
 
 u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u){
