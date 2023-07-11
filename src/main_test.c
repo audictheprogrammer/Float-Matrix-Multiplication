@@ -26,7 +26,7 @@ int main(int argc, char** argv){
     const int TEST3 = 0;
     const int TEST4 = 1;
     const int TEST5 = 0;
-    // const int TEST6 = 0;
+    const int TEST6 = 0;
     // const int TEST7 = 1;
 
 
@@ -130,9 +130,9 @@ int main(int argc, char** argv){
         u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
         fesetround(FE_TONEAREST);
 
-        int n = 1024;
+        int n = 512;
 
-        for (int i=0; i<1; i++){
+        for (int i=0; i<10; i++){
 
             double**A = random_matrix(n, p);
             double**B = random_matrix(n, p);
@@ -206,6 +206,14 @@ int main(int argc, char** argv){
         printf("res3 = %f \n", res3);
         printf("res4 = %f \n", res4);
     }
+
+    if (TEST6){
+        printf("Hello world ! \n");
+    }
+
+
+
+
 
     return 0;
 }

@@ -7,7 +7,7 @@ double modulo_naive(double a, double p){
 
 double modulo_SIMD1(double a, double p, double u){
     /* Function .1 from SIMD article for floats.
-    Hypothesis: Rounding mode = down and p < 2^26.
+    Hypothesis: Rounding mode = nearest and p < 2^26.
     */
     double b = a * u;
     double c = (double)(int)b;
@@ -73,8 +73,8 @@ u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u){
 void mp_naive(double** A, double** B, double** C, int n, double p){
     // Assert C is a zero matrix
     for (int i=0; i<n; i++){
-        for (int j=0; j<n; j++){
-            for (int k=0; k<n; k++){
+        for (int k=0; k<n; k++){
+            for (int j=0; j<n; j++){
                 double temp = modulo_naive(A[i][k] * B[k][j], p);
                 C[i][j] += temp;
             }
@@ -92,8 +92,8 @@ void mp_naive(double** A, double** B, double** C, int n, double p){
 void mp_SIMD1(double** A, double** B, double** C, int n, double p, double u){
     // Assert C is a zero matrix
     for (int i=0; i<n; i++){
-        for (int j=0; j<n; j++){
-            for (int k=0; k<n; k++){
+        for (int k=0; k<n; k++){
+            for (int j=0; j<n; j++){
                 double temp = modulo_SIMD1(A[i][k] * B[k][j], p, u);
                 C[i][j] += temp;
             }
@@ -111,8 +111,8 @@ void mp_SIMD1(double** A, double** B, double** C, int n, double p, double u){
 void mp_SIMD2(double** A, double** B, double** C, int n, double p, double u){
     // Assert C is a zero matrix
     for (int i=0; i<n; i++){
-        for (int j=0; j<n; j++){
-            for (int k=0; k<n; k++){
+        for (int k=0; k<n; k++){
+            for (int j=0; j<n; j++){
                 double temp = modulo_SIMD2(A[i][k] * B[k][j], p, u);
                 C[i][j] += temp;
             }
@@ -130,8 +130,8 @@ void mp_SIMD2(double** A, double** B, double** C, int n, double p, double u){
 void mp_SIMD3(double** A, double** B, double** C, int n, double p, double u){
     // Assert C is a zero matrix
     for (int i=0; i<n; i++){
-        for (int j=0; j<n; j++){
-            for (int k=0; k<n; k++){
+        for (int k=0; k<n; k++){
+            for (int j=0; j<n; j++){
                 double temp = modulo_SIMD3(A[i][k] * B[k][j], p, u);
                 C[i][j] += temp;
             }
@@ -150,8 +150,8 @@ void mp_SIMD3(double** A, double** B, double** C, int n, double p, double u){
 void mp_Barrett(double** A, double** B, double** C, int n, double p, u_int32_t u){
     // Assert C is a zero matrix
     for (int i=0; i<n; i++){
-        for (int j=0; j<n; j++){
-            for (int k=0; k<n; k++){
+        for (int k=0; k<n; k++){
+            for (int j=0; j<n; j++){
                 double temp = modulo_Barrett(A[i][k] * B[k][j], p, u);
                 C[i][j] += temp;
             }
