@@ -166,7 +166,12 @@ void mp_Barrett(double** A, double** B, double** C, int n, double p, u_int32_t u
 
 }
 
-void mp_block(double** A, double** B, double** C, int n, double p, int bitsize_p);
+void mp_block(double** A, double** B, double** C, int n, double p, int bitsize_p){
+    
+
+}
+
+
 
 int get_blocksize(int b, int n){
     // b: bitsize of p

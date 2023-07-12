@@ -4,6 +4,7 @@
 #include "matrix.h"
 #include "matrix_mul.h"
 #include <assert.h>
+#include <cblas.h>
 
 // int input(int argc, char** argv){
 //     if (argc != 2){
@@ -24,7 +25,7 @@ int main(int argc, char** argv){
     const int TEST1 = 0;
     const int TEST2 = 0;
     const int TEST3 = 0;
-    const int TEST4 = 0;
+    const int TEST4 = 1;
     const int TEST5 = 0;
     const int TEST6 = 1;
     // const int TEST7 = 1;
@@ -130,17 +131,17 @@ int main(int argc, char** argv){
         u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
         fesetround(FE_TONEAREST);
 
-        int n = 512;
+        int n = 1;
 
-        for (int i=0; i<10; i++){
+        for (int i=0; i<1; i++){
 
-            double**A = random_matrix(n, p);
-            double**B = random_matrix(n, p);
-            double**C = zero_matrix(n);  // Naive
-            double**D = zero_matrix(n);  // SIMD1
-            double**E = zero_matrix(n);  // SIMD2
-            double**F = zero_matrix(n);  // SIMD3
-            double**G = zero_matrix(n);  // Barrett
+            double**A = random_matrix_2D(n, p);
+            double**B = random_matrix_2D(n, p);
+            double**C = zero_matrix_2D(n);  // Naive
+            double**D = zero_matrix_2D(n);  // SIMD1
+            double**E = zero_matrix_2D(n);  // SIMD2
+            double**F = zero_matrix_2D(n);  // SIMD3
+            double**G = zero_matrix_2D(n);  // Barrett
 
 
             mp_naive(A, B, C, n, p);
@@ -158,18 +159,18 @@ int main(int argc, char** argv){
             write_matrix(F, n, "data/Matrix_F.txt");  // SIMD3
             write_matrix(G, n, "data/Matrix_G.txt");  // Barrett
 
-            int nb1 = equals_matrix(C, D, n);
-            int nb2 = equals_matrix(C, E, n);
-            int nb3 = equals_matrix(C, F, n);
-            int nb4 = equals_matrix(C, G, n);
+            int nb1 = equals_matrix_2D_2D(C, D, n);
+            int nb2 = equals_matrix_2D_2D(C, E, n);
+            int nb3 = equals_matrix_2D_2D(C, F, n);
+            int nb4 = equals_matrix_2D_2D(C, G, n);
 
-            delete_matrix(&A, n);
-            delete_matrix(&B, n);
-            delete_matrix(&C, n);
-            delete_matrix(&D, n);
-            delete_matrix(&E, n);
-            delete_matrix(&F, n);
-            delete_matrix(&G, n);
+            delete_matrix_2D(&A, n);
+            delete_matrix_2D(&B, n);
+            delete_matrix_2D(&C, n);
+            delete_matrix_2D(&D, n);
+            delete_matrix_2D(&E, n);
+            delete_matrix_2D(&F, n);
+            delete_matrix_2D(&G, n);
 
 
             printf("i=%d \n", i);
@@ -210,37 +211,41 @@ int main(int argc, char** argv){
     if (TEST6){
         // Testing blocksize and mp_block
         srand(time(NULL));
-        double p = pow(2, 26) - 5;
+        double p = pow(2, 3) - 5;
         int bitsize_p = 26;
-        int n = 1024;
+        int n = 2;
 
         int get = get_blocksize(bitsize_p, n);
         printf("get = %d \n", get);
+        double** A = random_matrix_2D(n, p);
+        double** B = random_matrix_2D(n, p);
+
+        double* A_1D = convert_2D_to_1D(A, n);
+        double* B_1D = convert_2D_to_1D(B, n);
+        double* C = zero_matrix_1D(n*n);
+        double** D = zero_matrix_2D(n);
 
 
-        // // Precomputed constants for Modular functions
-        // fesetround(FE_TONEAREST);
-        // double u = 1.0 / p;  // Constant for SIMD
-        // fesetround(FE_UPWARD);
-        // double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
-        // u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
-        // fesetround(FE_TONEAREST);
-        //
-        // int n = 512;
-        //
-        // double**A = random_matrix(n, p);
-        // double**B = random_matrix(n, p);
-        // double**C = zero_matrix(n);  // Naive
-        // double**D = zero_matrix(n);  // SIMD1
-        // double**E = zero_matrix(n);  // SIMD2
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A_1D,n, B_1D,n, 1, C,n);
+        mp_ikj(A, B, D, n);
 
+        print_matrix_2D(A, n);
+        printf("\n");
+        print_matrix_2D(B, n);
+        printf("\n");
+        print_matrix_1D(C, n);
+        printf("\n");
+        print_matrix_2D(D, n);
 
+        printf("C == D: %d \n", equals_matrix_2D_1D(D, C, n));
 
+        delete_matrix_2D(&A, n);
+        delete_matrix_2D(&B, n);
+        delete_matrix_2D(&D, n);
 
-
-
-
-
+        delete_matrix_1D(&A_1D, n);
+        delete_matrix_1D(&B_1D, n);
+        delete_matrix_1D(&C, n);
 
     }
 

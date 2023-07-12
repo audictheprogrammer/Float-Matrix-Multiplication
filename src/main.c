@@ -3,62 +3,68 @@
 #include <math.h>
 
 double benchmark_ijk(double** A, double** B, int n){
-    double** C = zero_matrix(n);
+    double** C = zero_matrix_2D(n);
 
     clock_t initial = clock();
     mp_ijk(A, B, C, n);
     clock_t final = clock();
 
+    delete_matrix_2D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
 double benchmark_kij(double** A, double** B, int n){
-    double** C = zero_matrix(n);
+    double** C = zero_matrix_2D(n);
 
     clock_t initial = clock();
     mp_kij(A, B, C, n);
     clock_t final = clock();
 
+    delete_matrix_2D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
 double benchmark_jki(double** A, double** B, int n){
-    double** C = zero_matrix(n);
+    double** C = zero_matrix_2D(n);
 
     clock_t initial = clock();
     mp_jki(A, B, C, n);
     clock_t final = clock();
 
+    delete_matrix_2D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
 double benchmark_ikj(double** A, double** B, int n){
-    double** C = zero_matrix(n);
+    double** C = zero_matrix_2D(n);
 
     clock_t initial = clock();
     mp_ikj(A, B, C, n);
     clock_t final = clock();
 
+    delete_matrix_2D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
 double benchmark_jik(double** A, double** B, int n){
-    double** C = zero_matrix(n);
+    double** C = zero_matrix_2D(n);
 
     clock_t initial = clock();
     mp_jik(A, B, C, n);
     clock_t final = clock();
 
+    delete_matrix_2D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
 double benchmark_kji(double** A, double** B, int n){
-    double** C = zero_matrix(n);
+    double** C = zero_matrix_2D(n);
 
     clock_t initial = clock();
     mp_kji(A, B, C, n);
     clock_t final = clock();
 
+    delete_matrix_2D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
@@ -70,52 +76,57 @@ void write_benchmark_time(char* filename, char* text, int n, double time){
 }
 
 double benchmark_mod_naive(double** A, double** B, int n, double p){
-    double** C = zero_matrix(n);
+    double** C = zero_matrix_2D(n);
 
     clock_t initial = clock();
     mp_naive(A, B, C, n, p);
     clock_t final = clock();
 
+    delete_matrix_2D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
 double benchmark_mod_SIMD1(double** A, double** B, int n, double p, double u){
-    double** C = zero_matrix(n);
+    double** C = zero_matrix_2D(n);
 
     clock_t initial = clock();
     mp_SIMD1(A, B, C, n, p, u);
     clock_t final = clock();
 
+    delete_matrix_2D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
 double benchmark_mod_SIMD2(double** A, double** B, int n, double p, double u){
-    double** C = zero_matrix(n);
+    double** C = zero_matrix_2D(n);
 
     clock_t initial = clock();
     mp_SIMD2(A, B, C, n, p, u);
     clock_t final = clock();
 
+    delete_matrix_2D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
  double benchmark_mod_SIMD3(double** A, double** B, int n, double p, double u){
-    double** C = zero_matrix(n);
+    double** C = zero_matrix_2D(n);
 
     clock_t initial = clock();
     mp_SIMD3(A, B, C, n, p, u);
     clock_t final = clock();
 
+    delete_matrix_2D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
 double benchmark_mod_Barrett(double** A, double** B, int n, double p, double u){
-    double** C = zero_matrix(n);
+    double** C = zero_matrix_2D(n);
 
     clock_t initial = clock();
     mp_Barrett(A, B, C, n, p, u);
     clock_t final = clock();
 
+    delete_matrix_2D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
@@ -135,14 +146,17 @@ void benchmark_loops_order(double p){
         double sum_kji = 0;
 
         for (int j=0; j<m; j++){
-            double**A = random_matrix(n, p);
-            double**B = random_matrix(n, p);
+            double**A = random_matrix_2D(n, p);
+            double**B = random_matrix_2D(n, p);
             sum_ijk += benchmark_ijk(A, B, n);
             sum_kij += benchmark_kij(A, B, n);
             sum_jki += benchmark_jki(A, B, n);
             sum_ikj += benchmark_ikj(A, B, n);
             sum_jik += benchmark_jik(A, B, n);
             sum_kji += benchmark_kji(A, B, n);
+
+            delete_matrix_2D(&A, n);
+            delete_matrix_2D(&B, n);
         }
         printf("\n");
         write_benchmark_time("data/benchmark_order_ijk.txt", "IJK", n, sum_ijk/m);
@@ -169,13 +183,16 @@ void benchmark_modulos(double p, double u, double u_overline, double u_b){
         double sum_mod_Barrett = 0;
 
         for (int j=0; j<m; j++){
-            double**A = random_matrix(n, p);
-            double**B = random_matrix(n, p);
+            double**A = random_matrix_2D(n, p);
+            double**B = random_matrix_2D(n, p);
             sum_mod_naive += benchmark_mod_naive(A, B, n, p);
             sum_mod_SIMD1 += benchmark_mod_SIMD1(A, B, n, p, u);
             sum_mod_SIMD2 += benchmark_mod_SIMD2(A, B, n, p, u_overline);
             sum_mod_SIMD3 += benchmark_mod_SIMD3(A, B, n, p, u_overline);
             sum_mod_Barrett += benchmark_mod_Barrett(A, B, n, p, u_b);
+
+            delete_matrix_2D(&A, n);
+            delete_matrix_2D(&B, n);
         }
 
         printf("\n");
@@ -228,7 +245,7 @@ int main(){
     // benchmark_loops_order(p);
 
     // Testing different modulo
-    // 10/07/23 11:35 I did a benchmark for 1
+    // 
     clean_file_modulos();
     benchmark_modulos(p, u, u_overline, u_b);
 
