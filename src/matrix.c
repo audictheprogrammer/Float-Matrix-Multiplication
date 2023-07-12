@@ -255,7 +255,6 @@ double** read_matrix(char* filename, int* n){
 }
 
 int equals_matrix_2D_2D(double** A, double** B, int n){
-
     /* Check if A equals B. The return values are:
     0: different
     1: equals
@@ -281,7 +280,6 @@ int equals_matrix_2D_2D(double** A, double** B, int n){
 }
 
 int equals_matrix_2D_1D(double** A, double* B, int n){
-
     /* Check if A equals B. The return values are:
     0: different
     1: equals
@@ -301,6 +299,14 @@ int equals_matrix_file(char* filename1, char* filename2){
     int n2;
     double** mat1 = read_matrix(filename1, &n1);
     double** mat2 = read_matrix(filename2, &n2);
+    if (n1 != n2){
+        delete_matrix_2D(&mat1, n1);
+        delete_matrix_2D(&mat2, n2);
+        return 0;
+    }
+    int res = equals_matrix_2D_2D(mat1, mat2, n1);
+    delete_matrix_2D(&mat1, n1);
+    delete_matrix_2D(&mat2, n2);
 
-    return equals_matrix_2D_2D(mat1, mat2, n1);
+    return res;
 }

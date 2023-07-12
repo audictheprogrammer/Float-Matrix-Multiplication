@@ -6,7 +6,7 @@ double modulo_naive(double a, double p){
 }
 
 double modulo_SIMD1(double a, double p, double u){
-    /* Function .1 from SIMD article for floats.
+    /* Function 3.1 from SIMD article for floats.
     Hypothesis: Rounding mode = nearest and p < 2^26.
     */
     double b = a * u;
@@ -71,7 +71,7 @@ u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u){
 }
 
 void mp_naive(double** A, double** B, double** C, int n, double p){
-    // Assert C is a zero matrix
+    // Assert C is a zero matrix.
     for (int i=0; i<n; i++){
         for (int k=0; k<n; k++){
             for (int j=0; j<n; j++){
@@ -166,9 +166,10 @@ void mp_Barrett(double** A, double** B, double** C, int n, double p, u_int32_t u
 
 }
 
-void mp_block(double** A, double** B, double** C, int n, double p, int bitsize_p){
+void mp_block(double* A, double* B, double* C, int n, double p, int bitsize_p){
+    /* Compute the matrix product A*B using blocks and OpenBLAS.
+    */
     
-
 }
 
 

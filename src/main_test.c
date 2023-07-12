@@ -25,10 +25,10 @@ int main(int argc, char** argv){
     const int TEST1 = 0;
     const int TEST2 = 0;
     const int TEST3 = 0;
-    const int TEST4 = 1;
+    const int TEST4 = 0;
     const int TEST5 = 0;
-    const int TEST6 = 1;
-    // const int TEST7 = 1;
+    const int TEST6 = 0;
+    const int TEST7 = 1;
 
 
     if (TEST1){
@@ -215,8 +215,8 @@ int main(int argc, char** argv){
         int bitsize_p = 26;
         int n = 2;
 
-        int get = get_blocksize(bitsize_p, n);
-        printf("get = %d \n", get);
+        int blocksize = get_blocksize(bitsize_p, n);
+        printf("blocksize = %d \n", blocksize);
         double** A = random_matrix_2D(n, p);
         double** B = random_matrix_2D(n, p);
 
@@ -225,8 +225,7 @@ int main(int argc, char** argv){
         double* C = zero_matrix_1D(n*n);
         double** D = zero_matrix_2D(n);
 
-
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A_1D,n, B_1D,n, 1, C,n);
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A_1D, n-1, B_1D,n, 1, C,n);
         mp_ikj(A, B, D, n);
 
         print_matrix_2D(A, n);
@@ -249,6 +248,39 @@ int main(int argc, char** argv){
 
     }
 
+    if (TEST7){
+        // Testing cblas_dgemm's lda ldb and ldc parameters.
+        int n;
+
+        double** A = read_matrix("data/Matrix_A_1D.txt", &n);
+        double** B = read_matrix("data/Matrix_B_1D.txt", &n);
+        double* A_1D = convert_2D_to_1D(A, n);
+        double* B_1D = convert_2D_to_1D(A, n);
+        double* C = zero_matrix_1D(n*n);
+        double* D = zero_matrix_1D(n*n);
+        double** E = zero_matrix_2D(n);
+
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A_1D, 900, B_1D, 3, 1, C,3);
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A_1D, 6, B_1D, 3, 1, D,3);
+        mp_ijk(A, B, E, n);
+
+        print_matrix_1D(C, n);
+        printf("\n");
+        print_matrix_1D(D, n);
+        printf("\n");
+        print_matrix_2D(E, n);
+
+
+        delete_matrix_2D(&A, n);
+        delete_matrix_2D(&B, n);
+        delete_matrix_2D(&E, n);
+
+        delete_matrix_1D(&A_1D, n);
+        delete_matrix_1D(&B_1D, n);
+        delete_matrix_1D(&C, n);
+        delete_matrix_1D(&D, n);
+
+    }
 
 
 
