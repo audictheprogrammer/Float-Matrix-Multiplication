@@ -12,6 +12,7 @@ double modulo_SIMD1(double a, double p, double u);
 double modulo_SIMD2(double a, double p, double u);
 double modulo_SIMD3(double a, double p, double u);
 u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u_b);
+int get_blocksize(int b, int n);
 
 void mp_naive(double** A, double** B, double** C, int n, double p);
 void mp_SIMD1(double** A, double** B, double** C, int n, double p, double u);

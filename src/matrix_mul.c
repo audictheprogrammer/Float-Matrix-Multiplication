@@ -168,7 +168,23 @@ void mp_Barrett(double** A, double** B, double** C, int n, double p, u_int32_t u
 
 void mp_block(double** A, double** B, double** C, int n, double p, int bitsize_p);
 
+int get_blocksize(int b, int n){
+    // b: bitsize of p
+    // n: size of matrix
+    // Return Max_{0 < k < n } {k * 2^{2b} < 2^53}
+    // Return 2^{ Max_{0 < i < log(n)} {i < 53-2b} }
 
+    int max_bitsize_double = 53;
+    int N = (int) ceil(log2(n));
+    int res = 1;
+    for (int i=1; i<N; i++){
+        if (i >= max_bitsize_double - 2*b){
+            return i;
+        }
+        res = i;
+    }
+    return pow(2, res);
+}
 
 
 // Comparing loop order. IKJ wins.

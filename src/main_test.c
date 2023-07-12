@@ -24,9 +24,9 @@ int main(int argc, char** argv){
     const int TEST1 = 0;
     const int TEST2 = 0;
     const int TEST3 = 0;
-    const int TEST4 = 1;
+    const int TEST4 = 0;
     const int TEST5 = 0;
-    const int TEST6 = 0;
+    const int TEST6 = 1;
     // const int TEST7 = 1;
 
 
@@ -208,27 +208,31 @@ int main(int argc, char** argv){
     }
 
     if (TEST6){
-        // Testing mp_block with OpenBLAS
+        // Testing blocksize and mp_block
         srand(time(NULL));
         double p = pow(2, 26) - 5;
         int bitsize_p = 26;
+        int n = 1024;
+
+        int get = get_blocksize(bitsize_p, n);
+        printf("get = %d \n", get);
 
 
-        // Precomputed constants for Modular functions
-        fesetround(FE_TONEAREST);
-        double u = 1.0 / p;  // Constant for SIMD
-        fesetround(FE_UPWARD);
-        double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
-        u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
-        fesetround(FE_TONEAREST);
-
-        int n = 512;
-
-        double**A = random_matrix(n, p);
-        double**B = random_matrix(n, p);
-        double**C = zero_matrix(n);  // Naive
-        double**D = zero_matrix(n);  // SIMD1
-        double**E = zero_matrix(n);  // SIMD2
+        // // Precomputed constants for Modular functions
+        // fesetround(FE_TONEAREST);
+        // double u = 1.0 / p;  // Constant for SIMD
+        // fesetround(FE_UPWARD);
+        // double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
+        // u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
+        // fesetround(FE_TONEAREST);
+        //
+        // int n = 512;
+        //
+        // double**A = random_matrix(n, p);
+        // double**B = random_matrix(n, p);
+        // double**C = zero_matrix(n);  // Naive
+        // double**D = zero_matrix(n);  // SIMD1
+        // double**E = zero_matrix(n);  // SIMD2
 
 
 
