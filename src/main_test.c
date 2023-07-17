@@ -29,7 +29,8 @@ int main(int argc, char** argv){
     const int TEST5 = 0;
     const int TEST6 = 0;
     const int TEST7 = 0;
-    const int TEST8 = 1;
+    const int TEST8 = 0;
+    const int TEST9 = 1;
 
 
     if (TEST1){
@@ -210,18 +211,16 @@ int main(int argc, char** argv){
     }
 
     if (TEST6){
-        // Testing blocksize and mp_block
+        // Testing blocksize
         srand(time(NULL));
-        double p = pow(2, 3) - 5;
+        double p = pow(2, 26) - 5;
         int bitsize_p = 26;
         int n = 2;
 
         int blocksize = get_blocksize(bitsize_p, n);
         printf("blocksize = %d \n", blocksize);
         double** A = random_matrix_2D(n, p);
-
         double** B = random_matrix_2D(n, p);
-
         double* A_1D = convert_2D_to_1D(A, n);
         double* B_1D = convert_2D_to_1D(B, n);
         double* C = zero_matrix_1D(n*n);
@@ -293,18 +292,41 @@ int main(int argc, char** argv){
     if (TEST8){
         // Testing sub_matrix product with OpenBLAS.
         int n;
-        int b = 2;
+        double p = pow(2, 26) - 5;
+        // double p = pow(2, 25) - 39;
+
+        fesetround(FE_UPWARD);
+        double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
+        fesetround(FE_TONEAREST);
 
         double** A = read_matrix("data/Matrix_A_1D_3.txt", &n);
         double** B = read_matrix("data/Matrix_B_1D_3.txt", &n);
+
+        int bitsize_p = get_bitsize(p);
+        int b = get_blocksize(bitsize_p, n);
+        printf("b = %d \n", b);
+
         double* A_1D = convert_2D_to_1D(A, n);
         double* B_1D = convert_2D_to_1D(B, n);
         double* C = zero_matrix_1D(n*n);
+        double* D = zero_matrix_1D(n*n);
+        double** E = zero_matrix_2D(n);
 
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,b,b,b, 1, A_1D + b, n, B_1D + n*b, n, 1, C + 0,n);
-        //
+        printf("Matrix A: \n");
+        print_matrix_1D(A_1D, n);
+        printf("Matrix B: \n");
+        print_matrix_1D(B_1D, n);
+
+        mp_block_BLAS(A_1D, B_1D, C, n, p, u_overline, b);
+        mp_block(A_1D, B_1D, D, n, p, u_overline, b);
+        mp_kij(A, B, E, n);
+
         printf("Matrix C: \n");
         print_matrix_1D(C, n);
+        printf("Matrix D: \n");
+        print_matrix_1D(D, n);
+        printf("Matrix E: \n");
+        print_matrix_2D(E, n);
 
         delete_matrix_2D(&A, n);
         delete_matrix_2D(&B, n);
@@ -312,9 +334,69 @@ int main(int argc, char** argv){
         delete_matrix_1D(&A_1D, n);
         delete_matrix_1D(&B_1D, n);
         delete_matrix_1D(&C, n);
+        delete_matrix_1D(&D, n);
 
     }
 
+    if (TEST9){
+        // Test for matrix product with blocks.
+        srand(time(NULL));
+        double p = pow(2, 26) - 5;
+        // double p = pow(2, 25) - 39;
+
+
+        // Precomputed constants for Modular and Blocking functions.
+        fesetround(FE_UPWARD);
+        double u_overline = 1.0 / p;
+        int n = 256;
+        int bitsize_p = get_bitsize(p);
+        printf("bp = %d \n", bitsize_p);
+        int b = get_blocksize(bitsize_p, n);
+        printf("b = %d \n", b);
+
+
+        for (int i=0; i<10; i++){
+
+            double**A = random_matrix_2D(n, p);
+            double**B = random_matrix_2D(n, p);
+            double* A_1D = convert_2D_to_1D(A, n);
+            double* B_1D = convert_2D_to_1D(B, n);
+            double*C = zero_matrix_1D(n*n);  // With BLAS
+            double*D = zero_matrix_1D(n*n);  // Without BLAS
+            double**E = zero_matrix_2D(n);  // Naive mp
+
+            mp_block_BLAS(A_1D, B_1D, C, n, p, u_overline, b);
+            mp_block(A_1D, B_1D, D, n, p, u_overline, b);
+            mp_SIMD2(A, B, E, n, p, u_overline);
+
+
+            // write_matrix(A, n, "data/Matrix_A.txt");
+            // write_matrix(B, n, "data/Matrix_B.txt");
+            // write_matrix(C, n, "data/Matrix_C.txt");  // Naive
+            // write_matrix(D, n, "data/Matrix_D.txt");  // SIMD1
+            // write_matrix(E, n, "data/Matrix_E.txt");  // SIMD2
+            // write_matrix(F, n, "data/Matrix_F.txt");  // SIMD3
+            // write_matrix(G, n, "data/Matrix_G.txt");  // Barrett
+
+            int nb1 = equals_matrix_2D_1D(E, C, n);
+            int nb2 = equals_matrix_2D_1D(E, D, n);
+
+            delete_matrix_2D(&A, n);
+            delete_matrix_2D(&B, n);
+            delete_matrix_1D(&A_1D, n);
+            delete_matrix_1D(&B_1D, n);
+            delete_matrix_1D(&C, n);
+            delete_matrix_1D(&D, n);
+            delete_matrix_2D(&E, n);
+
+
+            printf("i=%d \n", i);
+            assert(nb1==1);
+            assert(nb2==1);
+        }
+
+        printf("Tests passed \n");
+    }
 
 
 

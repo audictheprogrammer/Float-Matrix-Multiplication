@@ -9,7 +9,7 @@ matrix_mul.o: matrix_mul.c
 
 # Mains
 main: main.c matrix.o matrix_mul.o
-	gcc -o main main.c matrix.o matrix_mul.o -lm
+	gcc -o main main.c matrix.o matrix_mul.o -lopenblas -lm
 main_test: main_test.c matrix.o matrix_mul.o
 	gcc -o main_test main_test.c matrix.o matrix_mul.o -lopenblas -lm
 main_blas: main_blas.c

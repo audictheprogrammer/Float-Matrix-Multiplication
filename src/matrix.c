@@ -63,7 +63,7 @@ double* random_matrix_1D(int n, double p){
     with numbers between 0 and p-1. */
 
     // Allocate the matrix
-    double* mat = zero_matrix_1D(n);
+    double* mat = zero_matrix_1D(n*n);
     // Fill the matrix
     if (mat == NULL){
         return NULL;
@@ -253,7 +253,7 @@ double** read_matrix(char* filename, int* n){
             j++;
         }
     }
-    
+
     fclose(f);
     return mat;
 }

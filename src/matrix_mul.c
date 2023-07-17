@@ -165,31 +165,99 @@ void mp_Barrett(double** A, double** B, double** C, int n, double p, u_int32_t u
     }
 
 }
+//
+// void mp_block_2D(double** A, double** B, double** C, int n, double p, double u, int b){
+//     /* Compute the product of two 2D matrices using block product.
+//     Without OpenBLAS.
+//     */
+//     for (int i=0; i<n; i+=b){
+//         for (int j=0; j<n; j+=b){
+//             for (int k=0; k<n; k+=b){
+//
+//                 for (int ii=i; ii<i+b; ii++){
+//                     for (int jj=j; jj<j+b; jj++){
+//                         for (int kk=k; kk<k+b; kk++){
+//                             C[ii][jj] += A[ii][kk] + B[kk][jj];
+//                         }
+//                     }
+//                 }
+//
+//             }
+//         }
+//     }
+//
+// }
 
-void mp_block(double* A, double* B, double* C, int n, double p, int bitsize_p){
-    /* Compute the matrix product A*B using blocks and OpenBLAS.
+void mp_block(double* A, double* B, double* C, int n, double p, double u, int b){
+    /* Compute the product of two 1D matrices using block product.
+    Without OpenBLAS.
     */
-    
+    for (int i=0; i<n; i+=b){
+        for (int j=0; j<n; j+=b){
+            for (int k=0; k<n; k+=b){
+
+                for (int ii=i; ii<i+b; ii++){
+                    for (int jj=j; jj<j+b; jj++){
+                        for (int kk=k; kk<k+b; kk++){
+                            C[ii*n + jj] += A[ii*n + kk] * B[kk*n + jj];
+                        }
+                        C[ii*n + jj] = modulo_SIMD2(C[ii*n + jj], p, u);
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, int b){
+    for (int i=0; i<n; i+=b){
+        for (int j=0; j<n; j+=b){
+            for (int k=0; k<n; k+=b){
+                // Block
+                // printf("i*n+k = %d \n", i*n+k);
+                // printf("k*n+j = %d \n", k*n+j);
+                cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
+                            b, b, b, 1, A + (i*n + k), n, B + (k*n + j),
+                            n, 1, C + (i*n + j), n);
+                for (int ii=i; ii<i+b; ii++){
+                    for (int jj=j; jj<j+b; jj++){
+                        C[ii*n + jj] = modulo_SIMD2(C[ii*n + jj], p, u);
+                    }
+                }
+            }
+        }
+    }
 }
 
 
+int get_bitsize(double p){
+    /* Get the bitsize of p.
+    Bitsize < 26 because we work with doubles and product.
+    */
+    double MAX = pow(2, 26);
+    if (p >= MAX)
+        return -1;
+    if (p <= 0)
+        return -1;
+    int n = 1;
+    for (int i = 1; i<26; i++){
+        n = n*2;
+        if (p < n)
+            return i;
+    }
+    return 26;
+}
 
 int get_blocksize(int b, int n){
     // b: bitsize of p
     // n: size of matrix
-    // Return Max_{0 < k < n } {k * 2^{2b} < 2^53}
-    // Return 2^{ Max_{0 < i < log(n)} {i < 53-2b} }
-
     int max_bitsize_double = 53;
-    int N = (int) ceil(log2(n));
-    int res = 1;
-    for (int i=1; i<N; i++){
-        if (i >= max_bitsize_double - 2*b){
-            return i;
-        }
-        res = i;
+    int res = (int) pow(2, max_bitsize_double - 2*b);
+    if (res > n){
+        return n;
     }
-    return pow(2, res);
+    return res;
 }
 
 
