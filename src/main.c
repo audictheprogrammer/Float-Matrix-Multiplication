@@ -217,10 +217,11 @@ void clean_file_loops(){
 }
 
 void clean_file_modulos(){
-    char noms[4][64] = {"data/benchmark_modulo_naive.txt", "data/benchmark_modulo_SIMD1.txt",\
-     "data/benchmark_modulo_SIMD2.txt", "data/benchmark_modulo_SIMD3.txt"};
+    char noms[5][64] = {"data/benchmark_modulo_naive.txt", "data/benchmark_modulo_SIMD1.txt",\
+     "data/benchmark_modulo_SIMD2.txt", "data/benchmark_modulo_SIMD3.txt",
+     "data/benchmark_modulo_Barrett.txt"};
 
-    for (int i=0; i<4; i++){
+    for (int i=0; i<5; i++){
         FILE* f = fopen(noms[i], "w");
         fclose(f);
     }
@@ -245,7 +246,7 @@ int main(){
     // benchmark_loops_order(p);
 
     // Testing different modulo
-    // 
+    //
     clean_file_modulos();
     benchmark_modulos(p, u, u_overline, u_b);
 

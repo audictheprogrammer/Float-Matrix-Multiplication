@@ -28,7 +28,8 @@ int main(int argc, char** argv){
     const int TEST4 = 0;
     const int TEST5 = 0;
     const int TEST6 = 0;
-    const int TEST7 = 1;
+    const int TEST7 = 0;
+    const int TEST8 = 1;
 
 
     if (TEST1){
@@ -287,6 +288,30 @@ int main(int argc, char** argv){
         delete_matrix_1D(&C, n);
         delete_matrix_1D(&D, n);
         delete_matrix_1D(&E, n);
+
+    }
+    if (TEST8){
+        // Testing sub_matrix product with OpenBLAS.
+        int n;
+        int b = 2;
+
+        double** A = read_matrix("data/Matrix_A_1D_3.txt", &n);
+        double** B = read_matrix("data/Matrix_B_1D_3.txt", &n);
+        double* A_1D = convert_2D_to_1D(A, n);
+        double* B_1D = convert_2D_to_1D(B, n);
+        double* C = zero_matrix_1D(n*n);
+
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,b,b,b, 1, A_1D + b, n, B_1D + n*b, n, 1, C + 0,n);
+        //
+        printf("Matrix C: \n");
+        print_matrix_1D(C, n);
+
+        delete_matrix_2D(&A, n);
+        delete_matrix_2D(&B, n);
+
+        delete_matrix_1D(&A_1D, n);
+        delete_matrix_1D(&B_1D, n);
+        delete_matrix_1D(&C, n);
 
     }
 

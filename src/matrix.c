@@ -228,14 +228,17 @@ double** read_matrix(char* filename, int* n){
     // Treating first line.
     if (fgets(buffer, 1025, f) == NULL){
         printf("fgets error !\n");
+        fclose(f);
         return NULL;
     }
     if (sscanf(buffer, "%d", n) != 1){
         printf("sscanf error !\n");
+        fclose(f);
         return NULL;
     }
     double** mat = zero_matrix_2D(*n);
     if (mat == NULL){
+        fclose(f);
         return NULL;
     }
 
@@ -250,7 +253,8 @@ double** read_matrix(char* filename, int* n){
             j++;
         }
     }
-
+    
+    fclose(f);
     return mat;
 }
 
