@@ -21,4 +21,4 @@ replot "../data/benchmark_modulo_SIMD2.txt" using 1:2 title "SIMD2" with linespo
 replot "../data/benchmark_modulo_SIMD3.txt" using 1:2 title "SIMD3" with linespoints ls 5
 # replot "../data/benchmark_modulo_Barrett.txt" using 1:2 title "Barrett" with linespoints ls 6
 
-# Graph Order of loops
+# Graph Different modulos

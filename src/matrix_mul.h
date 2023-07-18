@@ -7,6 +7,7 @@
 #include <fenv.h>
 #include <math.h>
 #include <cblas.h>
+#include <omp.h>
 
 double modulo_naive(double a, double p);
 double modulo_SIMD1(double a, double p, double u);
@@ -21,9 +22,17 @@ void mp_SIMD1(double** A, double** B, double** C, int n, double p, double u);
 void mp_SIMD2(double** A, double** B, double** C, int n, double p, double u);
 void mp_SIMD3(double** A, double** B, double** C, int n, double p, double u);
 void mp_Barrett(double** A, double** B, double** C, int n, double p, u_int32_t u);
-// void mp_block_2D(double** A, double** B, double** C, int n, double p, double u, int blocksize);
+
+void mp_naive_MP(double** A, double** B, double** C, int n, double p);
+void mp_SIMD1_MP(double** A, double** B, double** C, int n, double p, double u);
+void mp_SIMD2_MP(double** A, double** B, double** C, int n, double p, double u);
+void mp_SIMD3_MP(double** A, double** B, double** C, int n, double p, double u);
+void mp_Barrett_MP(double** A, double** B, double** C, int n, double p, u_int32_t u);
+
+
 void mp_block(double* A, double* B, double* C, int n, double p, double u, int blocksize);
 void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, int b);
+
 
 void mp_ijk(double** A, double** B, double** C, int n);
 void mp_kij(double** A, double** B, double** C, int n);

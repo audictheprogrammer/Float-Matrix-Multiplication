@@ -30,7 +30,8 @@ int main(int argc, char** argv){
     const int TEST6 = 0;
     const int TEST7 = 0;
     const int TEST8 = 0;
-    const int TEST9 = 1;
+    const int TEST9 = 0;
+    const int TEST10 = 1;
 
 
     if (TEST1){
@@ -350,9 +351,7 @@ int main(int argc, char** argv){
         double u_overline = 1.0 / p;
         int n = 256;
         int bitsize_p = get_bitsize(p);
-        printf("bp = %d \n", bitsize_p);
         int b = get_blocksize(bitsize_p, n);
-        printf("b = %d \n", b);
 
 
         for (int i=0; i<10; i++){
@@ -393,6 +392,71 @@ int main(int argc, char** argv){
             printf("i=%d \n", i);
             assert(nb1==1);
             assert(nb2==1);
+        }
+
+        printf("Tests passed \n");
+    }
+
+    if (TEST10){
+        // Test for OpenMP
+        srand(time(NULL));
+        double p = pow(2, 26) - 5;
+
+        // Precomputed constants for Modular functions
+        fesetround(FE_TONEAREST);
+        double u = 1.0 / p;  // Constant for SIMD
+        fesetround(FE_UPWARD);
+        double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
+        u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
+        fesetround(FE_TONEAREST);
+
+        int n = 100;
+
+        for (int i=0; i<10; i++){
+
+            double**A = random_matrix_2D(n, p);
+            double**B = random_matrix_2D(n, p);
+            double**C = zero_matrix_2D(n);  // Naive
+            double**D = zero_matrix_2D(n);  // SIMD1
+            double**E = zero_matrix_2D(n);  // SIMD2
+            double**F = zero_matrix_2D(n);  // SIMD3
+            double**G = zero_matrix_2D(n);  // Barrett
+
+
+            mp_naive(A, B, C, n, p);
+            mp_SIMD1_MP(A, B, D, n, p, u);
+            mp_SIMD2_MP(A, B, E, n, p, u_overline);
+            mp_SIMD3(A, B, F, n, p, u_overline);
+            mp_Barrett_MP(A, B, G, n, p, u_b);
+
+
+            write_matrix(A, n, "data/Matrix_A.txt");
+            write_matrix(B, n, "data/Matrix_B.txt");
+            write_matrix(C, n, "data/Matrix_C.txt");  // Naive MP
+            write_matrix(D, n, "data/Matrix_D.txt");  // SIMD1 MP
+            write_matrix(E, n, "data/Matrix_E.txt");  // SIMD2 MP
+            write_matrix(F, n, "data/Matrix_F.txt");  // SIMD3 MP
+            write_matrix(G, n, "data/Matrix_G.txt");  // Barrett MP
+
+            int nb1 = equals_matrix_2D_2D(C, D, n);
+            int nb2 = equals_matrix_2D_2D(C, E, n);
+            int nb3 = equals_matrix_2D_2D(C, F, n);
+            int nb4 = equals_matrix_2D_2D(C, G, n);
+
+            delete_matrix_2D(&A, n);
+            delete_matrix_2D(&B, n);
+            delete_matrix_2D(&C, n);
+            delete_matrix_2D(&D, n);
+            delete_matrix_2D(&E, n);
+            delete_matrix_2D(&F, n);
+            delete_matrix_2D(&G, n);
+
+
+            printf("i=%d \n", i);
+            assert(nb1==1);
+            assert(nb2==1);
+            assert(nb3==1);
+            assert(nb4==1);
         }
 
         printf("Tests passed \n");

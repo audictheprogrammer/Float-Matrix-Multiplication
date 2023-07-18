@@ -1,0 +1,32 @@
+set xlabel "Matrix size"
+set ylabel "Time(s)"
+set title "OpenMP Mod"
+set logscale x
+set logscale y
+set key left top
+
+
+set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 7 pi -1 ps 1.5
+set style line 2 lc rgb '#0060ff' lt 1 lw 2 pt 7 pi -1 ps 1.5
+set style line 3 lc rgb '#60ad00' lt 1 lw 2 pt 7 pi -1 ps 1.5
+set style line 4 lc rgb '#60ff00' lt 1 lw 2 pt 7 pi -1 ps 1.5
+set style line 5 lc rgb '#ad00ff' lt 1 lw 2 pt 7 pi -1 ps 1.5
+set style line 6 lc rgb '#ff00ff' lt 1 lw 2 pt 7 pi -1 ps 1.5
+set pointintervalbox 3
+
+# plot "../data/benchmark_modulo_MP_naive.txt" using 1:2 title "MP Naive" with linespoints ls 1
+# replot "../data/benchmark_modulo_naive.txt" using 1:2 title "Naive" with linespoints ls 1
+
+# replot "../data/benchmark_modulo_MP_SIMD1.txt" using 1:2 title "MP SIMD1" with linespoints ls 3
+# replot "../data/benchmark_modulo_SIMD1.txt" using 1:2 title "SIMD1" with linespoints ls 3
+
+plot "../data/benchmark_modulo_MP_SIMD2.txt" using 1:2 title "MP SIMD2" with linespoints ls 3
+replot "../data/benchmark_modulo_SIMD2.txt" using 1:2 title "SIMD2" with linespoints ls 4
+
+replot "../data/benchmark_modulo_MP_SIMD3.txt" using 1:2 title "MP SIMD3" with linespoints ls 5
+replot "../data/benchmark_modulo_SIMD3.txt" using 1:2 title "SIMD3" with linespoints ls 6
+
+# replot "../data/benchmark_modulo_MP_Barrett.txt" using 1:2 title "MPBarrett" with linespoints ls 6
+# replot "../data/benchmark_modulo_Barrett.txt" using 1:2 title "Barrett" with linespoints ls 6
+
+# Graph OpenMP Mod

@@ -12,18 +12,8 @@ double modulo_SIMD1(double a, double p, double u){
     double b = a * u;
     double c = (double)(int)b;
     double d = a - c * p;
-    // if (d >= p) return d-p;
-    if (d >= p) {
-        printf("SIMD1: if1 \n");
-        return d-p;
-    }
-    // printf("SIMD1: if1 \n");
-    if (d < 0){
-        printf("SIMD2: if2 \n");
-        return d+p;
-    }
-
-    // if (d < 0) return d+p;
+    if (d >= p) return d-p;
+    if (d < 0) return d+p;
     return d;
 }
 
@@ -34,11 +24,7 @@ double modulo_SIMD2(double a, double p, double u){
     double b = a * u;
     double c = (double)(int)b;
     double d = a - c * p;
-    // if (d < 0) return d+p;
-    if (d < 0){
-        printf("d < 0 \n");
-        return d+p;
-    }
+    if (d < 0) return d+p;
     return d;
 }
 
@@ -165,36 +151,130 @@ void mp_Barrett(double** A, double** B, double** C, int n, double p, u_int32_t u
     }
 
 }
-//
-// void mp_block_2D(double** A, double** B, double** C, int n, double p, double u, int b){
-//     /* Compute the product of two 2D matrices using block product.
-//     Without OpenBLAS.
-//     */
-//     for (int i=0; i<n; i+=b){
-//         for (int j=0; j<n; j+=b){
-//             for (int k=0; k<n; k+=b){
-//
-//                 for (int ii=i; ii<i+b; ii++){
-//                     for (int jj=j; jj<j+b; jj++){
-//                         for (int kk=k; kk<k+b; kk++){
-//                             C[ii][jj] += A[ii][kk] + B[kk][jj];
-//                         }
-//                     }
-//                 }
-//
-//             }
-//         }
-//     }
-//
-// }
+
+
+
+// OpenMP
+void mp_naive_MP(double** A, double** B, double** C, int n, double p){
+    // Assert C is a zero matrix.
+    for (int i=0; i<n; i++){
+        for (int k=0; k<n; k++){
+            #pragma omp parallel for
+            for (int j=0; j<n; j++){
+                    C[i][j] = C[i][j] + modulo_naive(A[i][k] * B[k][j], p);
+                    // double temp = modulo_naive(A[i][k] * B[k][j], p);
+                    // C[i][j] += temp;
+            }
+        }
+    }
+
+    for (int i=0; i<n; i++){
+        #pragma omp parallel for
+        for (int j=0; j<n; j++){
+            C[i][j] = modulo_naive(C[i][j], p);
+        }
+    }
+
+}
+
+void mp_SIMD1_MP(double** A, double** B, double** C, int n, double p, double u){
+    // Assert C is a zero matrix
+    for (int i=0; i<n; i++){
+        for (int k=0; k<n; k++){
+            #pragma omp parallel for
+            for (int j=0; j<n; j++){
+                C[i][j] = C[i][j] + modulo_SIMD1(A[i][k] * B[k][j], p, u);
+                    // double temp = modulo_SIMD1(A[i][k] * B[k][j], p, u);
+                    // C[i][j] += temp;
+            }
+        }
+    }
+
+    for (int i=0; i<n; i++){
+        #pragma omp parallel for
+        for (int j=0; j<n; j++){
+                C[i][j] = modulo_SIMD1(C[i][j], p, u);
+        }
+    }
+
+}
+
+void mp_SIMD2_MP(double** A, double** B, double** C, int n, double p, double u){
+    // Assert C is a zero matrix
+    for (int i=0; i<n; i++){
+        for (int k=0; k<n; k++){
+            #pragma omp parallel for
+            for (int j=0; j<n; j++){
+                    C[i][j] = C[i][j] + modulo_SIMD2(A[i][k] * B[k][j], p, u);
+                    // double temp = modulo_SIMD2(A[i][k] * B[k][j], p, u);
+                    // C[i][j] += temp;
+            }
+        }
+    }
+
+    for (int i=0; i<n; i++){
+        #pragma omp parallel for
+        for (int j=0; j<n; j++){
+                C[i][j] = modulo_SIMD2(C[i][j], p, u);
+        }
+    }
+
+}
+
+void mp_SIMD3_MP(double** A, double** B, double** C, int n, double p, double u){
+    // Assert C is a zero matrix
+    for (int i=0; i<n; i++){
+        for (int k=0; k<n; k++){
+            #pragma omp parallel for
+            for (int j=0; j<n; j++){
+                    C[i][j] = C[i][j] + modulo_SIMD3(A[i][k] * B[k][j], p, u);
+                    // double temp = modulo_SIMD3(A[i][k] * B[k][j], p, u);
+                    // C[i][j] += temp;
+            }
+        }
+    }
+
+    for (int i=0; i<n; i++){
+        #pragma omp parallel for
+        for (int j=0; j<n; j++){
+            C[i][j] = modulo_SIMD3(C[i][j], p, u);
+        }
+    }
+
+}
+
+
+void mp_Barrett_MP(double** A, double** B, double** C, int n, double p, u_int32_t u){
+    // Assert C is a zero matrix
+    for (int i=0; i<n; i++){
+        for (int k=0; k<n; k++){
+            #pragma omp parallel for
+            for (int j=0; j<n; j++){
+                C[i][j] = C[i][j] + modulo_Barrett(A[i][k] * B[k][j], p, u);
+                    // double temp = modulo_Barrett(A[i][k] * B[k][j], p, u);
+                    // C[i][j] += temp;
+            }
+        }
+    }
+
+    for (int i=0; i<n; i++){
+        #pragma omp parallel for
+        for (int j=0; j<n; j++){
+            C[i][j] = modulo_Barrett(C[i][j], p, u);
+        }
+    }
+
+}
+
+
 
 void mp_block(double* A, double* B, double* C, int n, double p, double u, int b){
     /* Compute the product of two 1D matrices using block product.
     Without OpenBLAS.
     */
     for (int i=0; i<n; i+=b){
-        for (int j=0; j<n; j+=b){
-            for (int k=0; k<n; k+=b){
+        for (int k=0; k<n; k+=b){
+            for (int j=0; j<n; j+=b){
 
                 for (int ii=i; ii<i+b; ii++){
                     for (int jj=j; jj<j+b; jj++){
@@ -212,8 +292,8 @@ void mp_block(double* A, double* B, double* C, int n, double p, double u, int b)
 
 void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, int b){
     for (int i=0; i<n; i+=b){
-        for (int j=0; j<n; j+=b){
-            for (int k=0; k<n; k+=b){
+        for (int k=0; k<n; k+=b){
+            for (int j=0; j<n; j+=b){
                 // Block
                 // printf("i*n+k = %d \n", i*n+k);
                 // printf("k*n+j = %d \n", k*n+j);

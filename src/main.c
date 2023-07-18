@@ -71,7 +71,7 @@ double benchmark_kji(double** A, double** B, int n){
 }
 
 
-// Matrix Product with modulos-.
+// Matrix Product with modulos.
 
 double benchmark_mod_naive(double** A, double** B, int n, double p){
     double** C = zero_matrix_2D(n);
@@ -128,7 +128,90 @@ double benchmark_mod_Barrett(double** A, double** B, int n, double p, double u){
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
-// Matrix Product with Blocks.
+
+// Matrix product with modulos parallelized.
+double benchmark_mod_MP_naive(double** A, double** B, int n, double p){
+    double** C = zero_matrix_2D(n);
+    struct timespec initial, final;
+    double elapsed;
+
+    clock_gettime(CLOCK_MONOTONIC, &initial);
+    mp_naive_MP(A, B, C, n, p);
+    clock_gettime(CLOCK_MONOTONIC, &final);
+
+    elapsed = (final.tv_sec - initial.tv_sec);
+    elapsed += (final.tv_nsec - initial.tv_nsec) / 1000000000.0;
+
+    delete_matrix_2D(&C, n);
+    return elapsed;
+}
+
+double benchmark_mod_MP_SIMD1(double** A, double** B, int n, double p, double u){
+    double** C = zero_matrix_2D(n);
+    struct timespec initial, final;
+    double elapsed;
+
+    clock_gettime(CLOCK_MONOTONIC, &initial);
+    mp_SIMD1_MP(A, B, C, n, p, u);
+    clock_gettime(CLOCK_MONOTONIC, &final);
+
+    elapsed = (final.tv_sec - initial.tv_sec);
+    elapsed += (final.tv_nsec - initial.tv_nsec) / 1000000000.0;
+
+    delete_matrix_2D(&C, n);
+    return elapsed;
+}
+
+double benchmark_mod_MP_SIMD2(double** A, double** B, int n, double p, double u){
+    double** C = zero_matrix_2D(n);
+    struct timespec initial, final;
+    double elapsed;
+
+    clock_gettime(CLOCK_MONOTONIC, &initial);
+    mp_SIMD2_MP(A, B, C, n, p, u);
+    clock_gettime(CLOCK_MONOTONIC, &final);
+
+    elapsed = (final.tv_sec - initial.tv_sec);
+    elapsed += (final.tv_nsec - initial.tv_nsec) / 1000000000.0;
+
+    delete_matrix_2D(&C, n);
+    return elapsed;
+}
+
+ double benchmark_mod_MP_SIMD3(double** A, double** B, int n, double p, double u){
+     double** C = zero_matrix_2D(n);
+     struct timespec initial, final;
+     double elapsed;
+
+     clock_gettime(CLOCK_MONOTONIC, &initial);
+     mp_SIMD2_MP(A, B, C, n, p, u);
+     clock_gettime(CLOCK_MONOTONIC, &final);
+
+     elapsed = (final.tv_sec - initial.tv_sec);
+     elapsed += (final.tv_nsec - initial.tv_nsec) / 1000000000.0;
+
+     delete_matrix_2D(&C, n);
+     return elapsed;
+}
+
+double benchmark_mod_MP_Barrett(double** A, double** B, int n, double p, double u){
+    double** C = zero_matrix_2D(n);
+    struct timespec initial, final;
+    double elapsed;
+
+    clock_gettime(CLOCK_MONOTONIC, &initial);
+    mp_Barrett_MP(A, B, C, n, p, u);
+    clock_gettime(CLOCK_MONOTONIC, &final);
+
+    elapsed = (final.tv_sec - initial.tv_sec);
+    elapsed += (final.tv_nsec - initial.tv_nsec) / 1000000000.0;
+
+    delete_matrix_2D(&C, n);
+    return elapsed;
+}
+
+
+// Blocks Product
 
 double benchmark_blocks_NoBLAS(double* A, double* B, int n, double p, double u, int b){
     double* C = zero_matrix_1D(n*n);
@@ -203,7 +286,7 @@ void benchmark_modulos(double p, double u, double u_overline, double u_b){
     /* Benchmarking different modulos.
     The most efficient one SIMD2.
     */
-    int m = 5;  // Executes m times each algo
+    int m = 1;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
         double sum_mod_naive = 0;
@@ -238,7 +321,7 @@ void benchmark_modulos(double p, double u, double u_overline, double u_b){
 void benchmark_blocks(double p, double u_overline){
     /* Benchmarking different modulos.
     */
-    int m = 5;  // Executes m times each algo
+    int m = 1;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
         int b = get_blocksize(get_bitsize(p), n);
@@ -264,6 +347,44 @@ void benchmark_blocks(double p, double u_overline){
 }
 
 
+void benchmark_modulos_MP(double p, double u, double u_overline, double u_b){
+    /* Benchmarking different modulos.
+    The most efficient one SIMD2.
+    */
+    int m = 1;  // Executes m times each algo
+    for (int i=8; i<11; i++){
+        int n = (int) pow(2, i);
+
+        double sum_mod_MP_naive = 0;
+        double sum_mod_MP_SIMD1 = 0;
+        double sum_mod_MP_SIMD2 = 0;
+        double sum_mod_MP_SIMD3 = 0;
+        double sum_mod_MP_Barrett = 0;
+
+        for (int j=0; j<m; j++){
+            double**A = random_matrix_2D(n, p);
+            double**B = random_matrix_2D(n, p);
+            sum_mod_MP_naive += benchmark_mod_MP_naive(A, B, n, p);
+            sum_mod_MP_SIMD1 += benchmark_mod_MP_SIMD1(A, B, n, p, u);
+            sum_mod_MP_SIMD2 += benchmark_mod_MP_SIMD2(A, B, n, p, u_overline);
+            sum_mod_MP_SIMD3 += benchmark_mod_MP_SIMD3(A, B, n, p, u_overline);
+            sum_mod_MP_Barrett += benchmark_mod_MP_Barrett(A, B, n, p, u_b);
+
+            delete_matrix_2D(&A, n);
+            delete_matrix_2D(&B, n);
+        }
+
+        printf("\n");
+        write_benchmark_time("data/benchmark_modulo_MP_naive.txt", "Mod MP Naive", n, sum_mod_MP_naive);
+        write_benchmark_time("data/benchmark_modulo_MP_SIMD1.txt", "Mod MP SIMD1", n, sum_mod_MP_SIMD1);
+        write_benchmark_time("data/benchmark_modulo_MP_SIMD2.txt", "Mod MP SIMD2", n, sum_mod_MP_SIMD2);
+        write_benchmark_time("data/benchmark_modulo_MP_SIMD3.txt", "Mod MP SIMD3", n, sum_mod_MP_SIMD3);
+        write_benchmark_time("data/benchmark_modulo_MP_Barrett.txt", "Mod MP Barrett", n, sum_mod_MP_Barrett);
+
+    }
+}
+
+
 void clean_file_loops(){
     char noms[6][64] = {"data/benchmark_order_ijk.txt", "data/benchmark_order_ikj.txt",\
                     "data/benchmark_order_jik.txt", "data/benchmark_order_jki.txt",\
@@ -279,6 +400,17 @@ void clean_file_modulos(){
     char noms[5][64] = {"data/benchmark_modulo_naive.txt", "data/benchmark_modulo_SIMD1.txt",\
      "data/benchmark_modulo_SIMD2.txt", "data/benchmark_modulo_SIMD3.txt",
      "data/benchmark_modulo_Barrett.txt"};
+
+    for (int i=0; i<5; i++){
+        FILE* f = fopen(noms[i], "w");
+        fclose(f);
+    }
+}
+
+void clean_file_modulos_MP(){
+    char noms[5][64] = {"data/benchmark_modulo_MP_naive.txt", "data/benchmark_modulo_MP_SIMD1.txt",\
+     "data/benchmark_modulo_MP_SIMD2.txt", "data/benchmark_modulo_MP_SIMD3.txt",
+     "data/benchmark_modulo_MP_Barrett.txt"};
 
     for (int i=0; i<5; i++){
         FILE* f = fopen(noms[i], "w");
@@ -316,13 +448,16 @@ int main(){
     // benchmark_loops_order(p);
 
     // Benchmarking different modulos.
-    //
     // clean_file_modulos();
     // benchmark_modulos(p, u, u_overline, u_b);
 
+    // Benchmarking different modulos with OpenMP
+    clean_file_modulos_MP();
+    benchmark_modulos_MP(p, u, u_overline, u_b);
+
     // Benchmarking blocks.
-    clean_file_blocks();
-    benchmark_blocks(p, u_overline);
+    // clean_file_blocks();
+    // benchmark_blocks(p, u_overline);
 
 
     return 0;
