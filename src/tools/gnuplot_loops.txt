@@ -21,4 +21,4 @@ replot "../data/benchmark_order_jki.txt" using 1:2 title "JKI" with linespoints 
 replot "../data/benchmark_order_kij.txt" using 1:2 title "KIJ" with linespoints ls 5
 replot "../data/benchmark_order_kji.txt" using 1:2 title "KJI" with linespoints ls 6
 
-# Graphe Order of loops
+# Graph Order of loops
