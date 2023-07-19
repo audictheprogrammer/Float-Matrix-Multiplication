@@ -31,7 +31,8 @@ void mp_Barrett_MP(double* A, double* B, double* C, int n, double p, u_int32_t u
 
 
 void mp_block(double* A, double* B, double* C, int n, double p, double u, int blocksize);
-void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, int b);
+void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, int blocksize);
+void mp_block_BLAS_MP(double* A, double* B, double* C, int n, double p, double u, int blocksize);
 
 
 void mp_ijk(double* A, double* B, double* C, int n);

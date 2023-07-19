@@ -1,6 +1,6 @@
 set xlabel "Matrix size"
 set ylabel "Time(s)"
-set title "Blocks product"
+set title "Blocks multithreads"
 set logscale x
 set logscale y
 set key left top
@@ -15,8 +15,9 @@ set style line 6 lc rgb '#ff00ff' lt 1 lw 2 pt 7 pi -1 ps 1.5
 set pointintervalbox 3
 
 plot "../data/benchmark_modulo_SIMD2.txt" using 1:2 title "No blocks" with linespoints ls 1
+replot "../data/benchmark_modulo_MP_SIMD2.txt" using 1:2 title "MP SIMD2" with linespoints ls 2
 replot "../data/benchmark_blocks_BLAS.txt" using 1:2 title "BLAS" with linespoints ls 3
-replot "../data/benchmark_blocks_NoBLAS.txt" using 1:2 title "No BLAS" with linespoints ls 4
+replot "../data/benchmark_blocks_BLAS_MP.txt" using 1:2 title "BLAS MP" with linespoints ls 4
 replot "../data/benchmark_order_kij.txt" using 1:2 title "No Mod" with linespoints ls 5
 
-# Graph Blocks product with BLAS and without BLAS
+# Graph Blocks product with multithreads

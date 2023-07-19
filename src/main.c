@@ -241,6 +241,23 @@ double benchmark_blocks_BLAS(double* A, double* B, int n, double p, double u, in
 }
 
 
+double benchmark_blocks_BLAS_MP(double* A, double* B, int n, double p, double u, int b){
+    double* C = zero_matrix_1D(n);
+    struct timespec initial, final;
+    double elapsed;
+
+    clock_gettime(CLOCK_MONOTONIC, &initial);
+    mp_block_BLAS_MP(A, B, C, n, p, u, b);
+    clock_gettime(CLOCK_MONOTONIC, &final);
+
+    elapsed = (final.tv_sec - initial.tv_sec);
+    elapsed += (final.tv_nsec - initial.tv_nsec) / 1000000000.0;
+
+    delete_matrix_1D(&C, n);
+    return elapsed;
+}
+
+
 void write_benchmark_time(char* filename, char* text, int n, double time){
     FILE* f = fopen(filename, "a");
     printf("%s: n = %d time = %f \n", text,n, time);
@@ -291,7 +308,7 @@ void benchmark_modulos(double p, double u, double u_overline, double u_b){
     /* Benchmarking different modulos.
     The most efficient one SIMD2.
     */
-    int m = 1;  // Executes m times each algo
+    int m = 3;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
         double sum_mod_naive = 0;
@@ -323,40 +340,11 @@ void benchmark_modulos(double p, double u, double u_overline, double u_b){
     }
 }
 
-void benchmark_blocks(double p, double u_overline){
-    /* Benchmarking different modulos.
-    */
-    int m = 1;  // Executes m times each algo
-    for (int i=8; i<11; i++){
-        int n = (int) pow(2, i);
-        int b = get_blocksize(get_bitsize(p), n);
-
-        double sum_blocks = 0;
-        double sum_blocks_BLAS = 0;
-
-        for (int j=0; j<m; j++){
-            double*A = random_matrix_1D(n, p);
-            double*B = random_matrix_1D(n, p);
-            sum_blocks += benchmark_blocks_NoBLAS(A, B, n, p, u_overline, b);
-            sum_blocks_BLAS += benchmark_blocks_BLAS(A, B, n, p, u_overline, b);
-
-            delete_matrix_1D(&A, n);
-            delete_matrix_1D(&B, n);
-        }
-
-        printf("\n");
-        write_benchmark_time("data/benchmark_blocks_NoBLAS.txt", "Block", n, sum_blocks/m);
-        write_benchmark_time("data/benchmark_blocks_BLAS.txt", "Block BLAS", n, sum_blocks_BLAS/m);
-
-    }
-}
-
-
 void benchmark_modulos_MP(double p, double u, double u_overline, double u_b){
     /* Benchmarking different modulos.
     The most efficient one SIMD2.
     */
-    int m = 5;  // Executes m times each algo
+    int m = 3;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
 
@@ -389,6 +377,60 @@ void benchmark_modulos_MP(double p, double u, double u_overline, double u_b){
     }
 }
 
+
+void benchmark_blocks(double p, double u_overline){
+    /* Benchmarking different modulos.
+    */
+    int m = 3;  // Executes m times each algo
+    for (int i=8; i<11; i++){
+        int n = (int) pow(2, i);
+        int b = get_blocksize(get_bitsize(p), n);
+
+        double sum_blocks = 0;
+        double sum_blocks_BLAS = 0;
+
+        for (int j=0; j<m; j++){
+            double*A = random_matrix_1D(n, p);
+            double*B = random_matrix_1D(n, p);
+            sum_blocks += benchmark_blocks_NoBLAS(A, B, n, p, u_overline, b);
+            sum_blocks_BLAS += benchmark_blocks_BLAS(A, B, n, p, u_overline, b);
+
+            delete_matrix_1D(&A, n);
+            delete_matrix_1D(&B, n);
+        }
+
+        printf("\n");
+        write_benchmark_time("data/benchmark_blocks_NoBLAS.txt", "Block", n, sum_blocks/m);
+        write_benchmark_time("data/benchmark_blocks_BLAS.txt", "Block BLAS", n, sum_blocks_BLAS/m);
+
+    }
+}
+
+
+void benchmark_blocks_MP(double p, double u_overline){
+    /* Benchmarking different modulos.
+    */
+    int m = 3;  // Executes m times each algo
+    for (int i=8; i<11; i++){
+        int n = (int) pow(2, i);
+        int b = get_blocksize(get_bitsize(p), n);
+
+        double sum_blocks_BLAS_MP = 0;
+
+        for (int j=0; j<m; j++){
+            double*A = random_matrix_1D(n, p);
+            double*B = random_matrix_1D(n, p);
+            sum_blocks_BLAS_MP += benchmark_blocks_BLAS_MP(A, B, n, p, u_overline, b);
+
+            delete_matrix_1D(&A, n);
+            delete_matrix_1D(&B, n);
+        }
+
+        printf("\n");
+        write_benchmark_time("data/benchmark_blocks_BLAS_MP.txt", "Block BLAS MP", n, sum_blocks_BLAS_MP/m);
+
+    }
+}
 
 void clean_file_loops(){
     char noms[6][64] = {"data/benchmark_order_ijk.txt", "data/benchmark_order_ikj.txt",\
@@ -433,6 +475,16 @@ void clean_file_blocks(){
 
 }
 
+void clean_file_blocks_MP(){
+    char noms[1][64] = {"data/benchmark_blocks_BLAS_MP.txt"};
+
+    for (int i=0; i<1; i++){
+        FILE *f = fopen(noms[i], "w");
+        fclose(f);
+    }
+
+}
+
 
 int main(){
     // Initialization
@@ -456,12 +508,15 @@ int main(){
     // benchmark_modulos(p, u, u_overline, u_b);
 
     // Benchmarking different modulos with OpenMP
-    // clean_file_modulos_MP();
-    // benchmark_modulos_MP(p, u, u_overline, u_b);
+    clean_file_modulos_MP();
+    benchmark_modulos_MP(p, u, u_overline, u_b);
 
     // Benchmarking blocks.
     // clean_file_blocks();
     // benchmark_blocks(p, u_overline);
+
+    clean_file_blocks_MP();
+    benchmark_blocks_MP(p, u_overline);
 
 
     return 0;

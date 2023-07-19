@@ -55,7 +55,7 @@ u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u){
 
     if (res >= p) return res - p;
     return res;
-}   
+}
 
 void mp_naive(double* A, double* B, double* C, int n, double p){
     // Assert C is a zero matrix.
@@ -276,7 +276,7 @@ void mp_block(double* A, double* B, double* C, int n, double p, double u, int b)
 
         for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
-                C[i*n + j] = modulo_SIMD2(C[i*n + j], p, u);
+                C[i*n + j] = modulo_SIMD3(C[i*n + j], p, u);
             }
         }
 
@@ -296,7 +296,7 @@ void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, i
 
         for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
-                C[i*n + j] = modulo_SIMD2(C[i*n + j], p, u);
+                C[i*n + j] = modulo_SIMD3(C[i*n + j], p, u);
             }
         }
 
@@ -314,10 +314,10 @@ void mp_block_BLAS_MP(double* A, double* B, double* C, int n, double p, double u
                     n, n, b, 1, A + k, n, B + n*k, n,
                     1, C, n);
 
-
+        #pragma omp parallel for
         for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
-                C[i*n + j] = modulo_SIMD2(C[i*n + j], p, u);
+                C[i*n + j] = modulo_SIMD3(C[i*n + j], p, u);
             }
         }
 
