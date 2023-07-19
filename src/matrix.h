@@ -25,7 +25,9 @@ void print_matrix_2D(double** mat, int n);
 void print_matrix_1D(double* mat, int n);
 
 void write_matrix(double** mat, int n, char* filename);
+void write_matrix_1D(double* mat, int n, char* filename);
 double** read_matrix(char* filename, int* n);
+double* read_matrix_1D(char* filename, int* n);
 
 int equals_matrix_2D_2D(double** A, double** B, int n);
 int equals_matrix_2D_1D(double** A, double* B, int n);

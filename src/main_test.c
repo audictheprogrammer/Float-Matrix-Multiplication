@@ -22,12 +22,12 @@
 // }
 
 int main(int argc, char** argv){
-    const int TEST1 = 1;
-    const int TEST2 = 1;
-    const int TEST3 = 1;
-    const int TEST4 = 1;
-    const int TEST5 = 1;
-    const int TEST6 = 1;
+    const int TEST1 = 0;
+    const int TEST2 = 0;
+    const int TEST3 = 0;
+    const int TEST4 = 0;
+    const int TEST5 = 0;
+    const int TEST6 = 0;
     const int TEST7 = 0;
     const int TEST8 = 0;
     const int TEST9 = 0;
@@ -138,13 +138,13 @@ int main(int argc, char** argv){
 
         for (int i=0; i<1; i++){
 
-            double**A = random_matrix_2D(n, p);
-            double**B = random_matrix_2D(n, p);
-            double**C = zero_matrix_2D(n);  // Naive
-            double**D = zero_matrix_2D(n);  // SIMD1
-            double**E = zero_matrix_2D(n);  // SIMD2
-            double**F = zero_matrix_2D(n);  // SIMD3
-            double**G = zero_matrix_2D(n);  // Barrett
+            double* A = random_matrix_1D(n, p);
+            double* B = random_matrix_1D(n, p);
+            double* C = zero_matrix_1D(n);  // Naive
+            double* D = zero_matrix_1D(n);  // SIMD1
+            double* E = zero_matrix_1D(n);  // SIMD2
+            double* F = zero_matrix_1D(n);  // SIMD3
+            double* G = zero_matrix_1D(n);  // Barrett
 
 
             mp_naive(A, B, C, n, p);
@@ -154,26 +154,26 @@ int main(int argc, char** argv){
             mp_Barrett(A, B, G, n, p, u_b);
 
 
-            write_matrix(A, n, "data/Matrix_A.txt");
-            write_matrix(B, n, "data/Matrix_B.txt");
-            write_matrix(C, n, "data/Matrix_C.txt");  // Naive
-            write_matrix(D, n, "data/Matrix_D.txt");  // SIMD1
-            write_matrix(E, n, "data/Matrix_E.txt");  // SIMD2
-            write_matrix(F, n, "data/Matrix_F.txt");  // SIMD3
-            write_matrix(G, n, "data/Matrix_G.txt");  // Barrett
+            write_matrix_1D(A, n, "data/Matrix_A.txt");
+            write_matrix_1D(B, n, "data/Matrix_B.txt");
+            write_matrix_1D(C, n, "data/Matrix_C.txt");  // Naive
+            write_matrix_1D(D, n, "data/Matrix_D.txt");  // SIMD1
+            write_matrix_1D(E, n, "data/Matrix_E.txt");  // SIMD2
+            write_matrix_1D(F, n, "data/Matrix_F.txt");  // SIMD3
+            write_matrix_1D(G, n, "data/Matrix_G.txt");  // Barrett
 
-            int nb1 = equals_matrix_2D_2D(C, D, n);
-            int nb2 = equals_matrix_2D_2D(C, E, n);
-            int nb3 = equals_matrix_2D_2D(C, F, n);
-            int nb4 = equals_matrix_2D_2D(C, G, n);
+            int nb1 = equals_matrix_1D_1D(C, D, n);
+            int nb2 = equals_matrix_1D_1D(C, E, n);
+            int nb3 = equals_matrix_1D_1D(C, F, n);
+            int nb4 = equals_matrix_1D_1D(C, G, n);
 
-            delete_matrix_2D(&A, n);
-            delete_matrix_2D(&B, n);
-            delete_matrix_2D(&C, n);
-            delete_matrix_2D(&D, n);
-            delete_matrix_2D(&E, n);
-            delete_matrix_2D(&F, n);
-            delete_matrix_2D(&G, n);
+            delete_matrix_1D(&A, n);
+            delete_matrix_1D(&B, n);
+            delete_matrix_1D(&C, n);
+            delete_matrix_1D(&D, n);
+            delete_matrix_1D(&E, n);
+            delete_matrix_1D(&F, n);
+            delete_matrix_1D(&G, n);
 
 
             printf("i=%d \n", i);
@@ -220,19 +220,17 @@ int main(int argc, char** argv){
 
         int blocksize = get_blocksize(bitsize_p, n);
         printf("blocksize = %d \n", blocksize);
-        double** A = random_matrix_2D(n, p);
-        double** B = random_matrix_2D(n, p);
-        double* A_1D = convert_2D_to_1D(A, n);
-        double* B_1D = convert_2D_to_1D(B, n);
-        double* C = zero_matrix_1D(n*n);
-        double* D = zero_matrix_1D(n*n);
+        double* A = random_matrix_1D(n, p);
+        double* B = random_matrix_1D(n, p);
+        double* C = zero_matrix_1D(n);
+        double* D = zero_matrix_1D(n);
 
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A_1D, n, B_1D,n, 1, C,n);
-        mp_ikj(A_1D, B_1D, D, n);
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A, n, B,n, 1, C,n);
+        mp_ikj(A, B, D, n);
 
-        print_matrix_2D(A, n);
+        print_matrix_1D(A, n);
         printf("\n");
-        print_matrix_2D(B, n);
+        print_matrix_1D(B, n);
         printf("\n");
         print_matrix_1D(C, n);
         printf("\n");
@@ -240,11 +238,8 @@ int main(int argc, char** argv){
 
         printf("C == D: %d \n", equals_matrix_1D_1D(D, C, n));
 
-        delete_matrix_2D(&A, n);
-        delete_matrix_2D(&B, n);
-
-        delete_matrix_1D(&A_1D, n);
-        delete_matrix_1D(&B_1D, n);
+        delete_matrix_1D(&A, n);
+        delete_matrix_1D(&B, n);
         delete_matrix_1D(&C, n);
         delete_matrix_1D(&D, n);
 
@@ -253,24 +248,23 @@ int main(int argc, char** argv){
     if (TEST7){
         // Testing cblas_dgemm's lda ldb and ldc parameters.
         int n;
+        double* A = read_matrix_1D("data/Matrix_A_2.txt", &n);
+        double* B = read_matrix_1D("data/Matrix_B_2.txt", &n);
+        if (A == NULL || B == NULL)
+            return 1;
+        double* C = zero_matrix_1D(n);
+        double* D = zero_matrix_1D(n);
+        double* E = zero_matrix_1D(n);
 
-        double** A = read_matrix("data/Matrix_A_1D_2.txt", &n);
-        double** B = read_matrix("data/Matrix_B_1D_2.txt", &n);
-        double* A_1D = convert_2D_to_1D(A, n);
-        double* B_1D = convert_2D_to_1D(B, n);
-        double* C = zero_matrix_1D(n*n);
-        double* D = zero_matrix_1D(n*n);
-        double* E = zero_matrix_1D(n*n);
+        // printf("A[%d] = %f \n", n*n, A[n*n]);
+        // printf("A[%d] = %f \n", n*n+1, A[n*n+1]);
+        // A[n*n] = -1;
+        print_matrix_1D(A, n);
+        print_matrix_1D(B, n);
 
-        printf("A[%d] = %f \n", n*n, A_1D[n*n]);
-        printf("A[%d] = %f \n", n*n+1, A_1D[n*n+1]);
-        // A_1D[n*n] = -1;
-        print_matrix_1D(A_1D, n);
-        print_matrix_1D(B_1D, n);
-
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A_1D, 1+n, B_1D, n, 1, C,n);
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A_1D, 2*n, B_1D, n, 1, D,n);
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A_1D, n, B_1D, n, 1, E,n);
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A, 1+n, B, n, 1, C,n);
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A, 2*n, B, n, 1, D,n);
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A, n, B, n, 1, E,n);
 
         printf("LDA = %d \n", n+1);
         print_matrix_1D(C, n);
@@ -280,11 +274,8 @@ int main(int argc, char** argv){
         print_matrix_1D(E, n);
 
 
-        delete_matrix_2D(&A, n);
-        delete_matrix_2D(&B, n);
-
-        delete_matrix_1D(&A_1D, n);
-        delete_matrix_1D(&B_1D, n);
+        delete_matrix_1D(&A, n);
+        delete_matrix_1D(&B, n);
         delete_matrix_1D(&C, n);
         delete_matrix_1D(&D, n);
         delete_matrix_1D(&E, n);
@@ -300,27 +291,25 @@ int main(int argc, char** argv){
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
         fesetround(FE_TONEAREST);
 
-        double** A = read_matrix("data/Matrix_A_1D_3.txt", &n);
-        double** B = read_matrix("data/Matrix_B_1D_3.txt", &n);
+        double* A = read_matrix_1D("data/Matrix_A_3.txt", &n);
+        double* B = read_matrix_1D("data/Matrix_B_3.txt", &n);
 
         int bitsize_p = get_bitsize(p);
         int b = get_blocksize(bitsize_p, n);
         printf("b = %d \n", b);
 
-        double* A_1D = convert_2D_to_1D(A, n);
-        double* B_1D = convert_2D_to_1D(B, n);
-        double* C = zero_matrix_1D(n*n);
-        double* D = zero_matrix_1D(n*n);
-        double* E = zero_matrix_1D(n*n);
+        double* C = zero_matrix_1D(n);
+        double* D = zero_matrix_1D(n);
+        double* E = zero_matrix_1D(n);
 
         printf("Matrix A: \n");
-        print_matrix_1D(A_1D, n);
+        print_matrix_1D(A, n);
         printf("Matrix B: \n");
-        print_matrix_1D(B_1D, n);
+        print_matrix_1D(B, n);
 
-        mp_block_BLAS(A_1D, B_1D, C, n, p, u_overline, b);
-        mp_block(A_1D, B_1D, D, n, p, u_overline, b);
-        mp_kij(A_1D, B_1D, E, n);
+        mp_block_BLAS(A, B, C, n, p, u_overline, b);
+        mp_block(A, B, D, n, p, u_overline, b);
+        mp_kij(A, B, E, n);
 
         printf("Matrix C: \n");
         print_matrix_1D(C, n);
@@ -329,11 +318,8 @@ int main(int argc, char** argv){
         printf("Matrix E: \n");
         print_matrix_1D(E, n);
 
-        delete_matrix_2D(&A, n);
-        delete_matrix_2D(&B, n);
-
-        delete_matrix_1D(&A_1D, n);
-        delete_matrix_1D(&B_1D, n);
+        delete_matrix_1D(&A, n);
+        delete_matrix_1D(&B, n);
         delete_matrix_1D(&C, n);
         delete_matrix_1D(&D, n);
         delete_matrix_1D(&E, n);
@@ -359,37 +345,33 @@ int main(int argc, char** argv){
 
         for (int i=0; i<10; i++){
 
-            double**A = random_matrix_2D(n, p);
-            double**B = random_matrix_2D(n, p);
-            double* A_1D = convert_2D_to_1D(A, n);
-            double* B_1D = convert_2D_to_1D(B, n);
-            double*C = zero_matrix_1D(n*n);  // With BLAS
-            double*D = zero_matrix_1D(n*n);  // Without BLAS
-            double**E = zero_matrix_2D(n);  // Naive mp
+            double* A = random_matrix_1D(n, p);
+            double* B = random_matrix_1D(n, p);
+            double* C = zero_matrix_1D(n);  // With BLAS
+            double* D = zero_matrix_1D(n);  // Without BLAS
+            double* E = zero_matrix_1D(n);  // Naive mp
 
-            mp_block_BLAS(A_1D, B_1D, C, n, p, u_overline, b);
-            mp_block(A_1D, B_1D, D, n, p, u_overline, b);
+            mp_block_BLAS(A, B, C, n, p, u_overline, b);
+            mp_block(A, B, D, n, p, u_overline, b);
             mp_SIMD2(A, B, E, n, p, u_overline);
 
 
-            // write_matrix(A, n, "data/Matrix_A.txt");
-            // write_matrix(B, n, "data/Matrix_B.txt");
-            // write_matrix(C, n, "data/Matrix_C.txt");  // Naive
-            // write_matrix(D, n, "data/Matrix_D.txt");  // SIMD1
-            // write_matrix(E, n, "data/Matrix_E.txt");  // SIMD2
-            // write_matrix(F, n, "data/Matrix_F.txt");  // SIMD3
-            // write_matrix(G, n, "data/Matrix_G.txt");  // Barrett
+            // write_matrix_1D(A, n, "data/Matrix_A.txt");
+            // write_matrix_1D(B, n, "data/Matrix_B.txt");
+            // write_matrix_1D(C, n, "data/Matrix_C.txt");  // Naive
+            // write_matrix_1D(D, n, "data/Matrix_D.txt");  // SIMD1
+            // write_matrix_1D(E, n, "data/Matrix_E.txt");  // SIMD2
+            // write_matrix_1D(F, n, "data/Matrix_F.txt");  // SIMD3
+            // write_matrix_1D(G, n, "data/Matrix_G.txt");  // Barrett
 
-            int nb1 = equals_matrix_2D_1D(E, C, n);
-            int nb2 = equals_matrix_2D_1D(E, D, n);
+            int nb1 = equals_matrix_1D_1D(E, C, n);
+            int nb2 = equals_matrix_1D_1D(E, D, n);
 
-            delete_matrix_2D(&A, n);
-            delete_matrix_2D(&B, n);
-            delete_matrix_1D(&A_1D, n);
-            delete_matrix_1D(&B_1D, n);
+            delete_matrix_1D(&A, n);
+            delete_matrix_1D(&B, n);
             delete_matrix_1D(&C, n);
             delete_matrix_1D(&D, n);
-            delete_matrix_2D(&E, n);
+            delete_matrix_1D(&E, n);
 
 
             printf("i=%d \n", i);
@@ -417,13 +399,13 @@ int main(int argc, char** argv){
 
         for (int i=0; i<10; i++){
 
-            double**A = random_matrix_2D(n, p);
-            double**B = random_matrix_2D(n, p);
-            double**C = zero_matrix_2D(n);  // Naive
-            double**D = zero_matrix_2D(n);  // SIMD1
-            double**E = zero_matrix_2D(n);  // SIMD2
-            double**F = zero_matrix_2D(n);  // SIMD3
-            double**G = zero_matrix_2D(n);  // Barrett
+            double* A = random_matrix_1D(n, p);
+            double* B = random_matrix_1D(n, p);
+            double* C = zero_matrix_1D(n);  // Naive
+            double* D = zero_matrix_1D(n);  // SIMD1
+            double* E = zero_matrix_1D(n);  // SIMD2
+            double* F = zero_matrix_1D(n);  // SIMD3
+            double* G = zero_matrix_1D(n);  // Barrett
 
 
             mp_naive_MP(A, B, C, n, p);
@@ -433,26 +415,26 @@ int main(int argc, char** argv){
             mp_Barrett_MP(A, B, G, n, p, u_b);
 
 
-            write_matrix(A, n, "data/Matrix_A.txt");
-            write_matrix(B, n, "data/Matrix_B.txt");
-            write_matrix(C, n, "data/Matrix_C.txt");  // Naive MP
-            write_matrix(D, n, "data/Matrix_D.txt");  // SIMD1 MP
-            write_matrix(E, n, "data/Matrix_E.txt");  // SIMD2 MP
-            write_matrix(F, n, "data/Matrix_F.txt");  // SIMD3 MP
-            write_matrix(G, n, "data/Matrix_G.txt");  // Barrett MP
+            write_matrix_1D(A, n, "data/Matrix_A.txt");
+            write_matrix_1D(B, n, "data/Matrix_B.txt");
+            write_matrix_1D(C, n, "data/Matrix_C.txt");  // Naive MP
+            write_matrix_1D(D, n, "data/Matrix_D.txt");  // SIMD1 MP
+            write_matrix_1D(E, n, "data/Matrix_E.txt");  // SIMD2 MP
+            write_matrix_1D(F, n, "data/Matrix_F.txt");  // SIMD3 MP
+            write_matrix_1D(G, n, "data/Matrix_G.txt");  // Barrett MP
 
-            int nb1 = equals_matrix_2D_2D(C, D, n);
-            int nb2 = equals_matrix_2D_2D(C, E, n);
-            int nb3 = equals_matrix_2D_2D(C, F, n);
-            int nb4 = equals_matrix_2D_2D(C, G, n);
+            int nb1 = equals_matrix_1D_1D(C, D, n);
+            int nb2 = equals_matrix_1D_1D(C, E, n);
+            int nb3 = equals_matrix_1D_1D(C, F, n);
+            int nb4 = equals_matrix_1D_1D(C, G, n);
 
-            delete_matrix_2D(&A, n);
-            delete_matrix_2D(&B, n);
-            delete_matrix_2D(&C, n);
-            delete_matrix_2D(&D, n);
-            delete_matrix_2D(&E, n);
-            delete_matrix_2D(&F, n);
-            delete_matrix_2D(&G, n);
+            delete_matrix_1D(&A, n);
+            delete_matrix_1D(&B, n);
+            delete_matrix_1D(&C, n);
+            delete_matrix_1D(&D, n);
+            delete_matrix_1D(&E, n);
+            delete_matrix_1D(&F, n);
+            delete_matrix_1D(&G, n);
 
 
             printf("i=%d \n", i);

@@ -25,13 +25,13 @@ double** zero_matrix_2D(int n){
 }
 
 double* zero_matrix_1D(int n){
-    /* Allocate a 1 dimensional square matrix. */
-    double* mat = (double*) malloc(sizeof(double) * n);
+    /* Allocate a 1 dimensional square matrix of size n*n. */
+    double* mat = (double*) malloc(sizeof(double) * n*n);
     if (mat == NULL){
         printf("Malloc error !\n");
         return NULL;
     }
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < n*n; i++){
         mat[i] = 0;
     }
 
@@ -63,7 +63,7 @@ double* random_matrix_1D(int n, double p){
     with numbers between 0 and p-1. */
 
     // Allocate the matrix
-    double* mat = zero_matrix_1D(n*n);
+    double* mat = zero_matrix_1D(n);
     // Fill the matrix
     if (mat == NULL){
         return NULL;
@@ -98,7 +98,7 @@ double** convert_1D_to_2D(double* A, int n){
 double* convert_2D_to_1D(double** A, int n){
     /* Converts a 2 dimensional square matrix to
     a 1 dimensional matrix. */
-    double* mat = zero_matrix_1D(n*n);
+    double* mat = zero_matrix_1D(n);
     int count = 0;
     for (int i=0; i<n; i++){
         for (int j=0; j<n; j++){
@@ -217,11 +217,24 @@ void write_matrix(double** mat, int n, char* filename){
     return;
 }
 
+void write_matrix_1D(double* mat, int n, char* filename){
+    /* Write the matrix into a file. Here is an example:
+    2
+    [ 1 2 ]
+    [ 3 4 ]
+    */
+    double** A = convert_1D_to_2D(mat, n);
+    write_matrix(A, n, filename);
+    delete_matrix_2D(&A, n);
+    return;
+}
+
 double** read_matrix(char* filename, int* n){
     /* Read the file, update n, then return the matrix. */
     char buffer[1024];
     FILE* f = fopen(filename, "r");
     if (f == NULL){
+        printf("Cannot open file: %s \n", filename);
         return NULL;
     }
 
@@ -257,6 +270,17 @@ double** read_matrix(char* filename, int* n){
     fclose(f);
     return mat;
 }
+
+double* read_matrix_1D(char* filename, int* n){
+    double** mat = read_matrix(filename, n);
+    if (mat == NULL)
+        return NULL;
+    double* A = convert_2D_to_1D(mat, *n);
+    delete_matrix_2D(&mat, *n);
+    return A;
+
+}
+
 
 int equals_matrix_2D_2D(double** A, double** B, int n){
     /* Check if A equals B. The return values are:
