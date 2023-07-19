@@ -29,6 +29,7 @@ double** read_matrix(char* filename, int* n);
 
 int equals_matrix_2D_2D(double** A, double** B, int n);
 int equals_matrix_2D_1D(double** A, double* B, int n);
+int equals_matrix_1D_1D(double* A, double* B, int n);
 
 int equals_matrix_file(char* filename1, char* filename2);
 

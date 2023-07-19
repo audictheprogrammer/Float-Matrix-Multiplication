@@ -356,25 +356,24 @@ int get_blocksize(int b, int n){
 // Comparing loop order. IKJ wins.
 
 // Loop 1
-void mp_ijk(double** A, double** B, double** C, int n){
+void mp_ijk(double* A, double* B, double* C, int n){
     // Assert C is a zero matrix
     for (int i=0; i<n; i++){
         for (int j=0; j<n; j++){
             for (int k=0; k<n; k++){
-                C[i][j] += A[i][k] * B[k][j];
+                C[i*n + j] += A[i*n + k] * B[k*n + j];
             }
         }
     }
 }
 
-
 // Loop 2
-void mp_kij(double** A, double** B, double** C, int n){
+void mp_kij(double* A, double* B, double* C, int n){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
         for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
-                C[i][j] += A[i][k] * B[k][j];
+                C[i*n + j] += A[i*n + k] * B[k*n + j];
             }
         }
     }
@@ -382,48 +381,48 @@ void mp_kij(double** A, double** B, double** C, int n){
 
 
 // Loop 3
-void mp_jki(double** A, double** B, double** C, int n){
+void mp_jki(double* A, double* B, double* C, int n){
     // Assert C is a zero matrix
     for (int j=0; j<n; j++){
         for (int k=0; k<n; k++){
             for (int i=0; i<n; i++){
-                C[i][j] += A[i][k] * B[k][j];
+                C[i*n + j] += A[i*n + k] * B[k*n + j];
             }
         }
     }
 }
 
 // Loop 4
-void mp_ikj(double** A, double** B, double** C, int n){
+void mp_ikj(double* A, double* B, double* C, int n){
     // Assert C is a zero matrix
     for (int i=0; i<n; i++){
         for (int k=0; k<n; k++){
             for (int j=0; j<n; j++){
-                C[i][j] += A[i][k] * B[k][j];
+                C[i*n + j] += A[i*n + k] * B[k*n + j];
             }
         }
     }
 }
 
 // Loop 5
-void mp_jik(double** A, double** B, double** C, int n){
+void mp_jik(double* A, double* B, double* C, int n){
     // Assert C is a zero matrix
     for (int j=0; j<n; j++){
         for (int i=0; i<n; i++){
             for (int k=0; k<n; k++){
-                C[i][j] += A[i][k] * B[k][j];
+                C[i*n + j] += A[i*n + k] * B[k*n + j];
             }
         }
     }
 }
 
 // Loop 6
-void mp_kji(double** A, double** B, double** C, int n){
+void mp_kji(double* A, double* B, double* C, int n){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
         for (int j=0; j<n; j++){
             for (int i=0; i<n; i++){
-                C[i][j] += A[i][k] * B[k][j];
+                C[i*n + j] += A[i*n + k] * B[k*n + j];
             }
         }
     }

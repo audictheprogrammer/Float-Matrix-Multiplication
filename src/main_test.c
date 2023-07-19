@@ -22,18 +22,16 @@
 // }
 
 int main(int argc, char** argv){
-    const int TEST1 = 0;
-    const int TEST2 = 0;
-    const int TEST3 = 0;
-    const int TEST4 = 0;
-    const int TEST5 = 0;
-    const int TEST6 = 0;
+    const int TEST1 = 1;
+    const int TEST2 = 1;
+    const int TEST3 = 1;
+    const int TEST4 = 1;
+    const int TEST5 = 1;
+    const int TEST6 = 1;
     const int TEST7 = 0;
     const int TEST8 = 0;
     const int TEST9 = 0;
     const int TEST10 = 0;
-    const int TEST11 = 1;
-
 
 
     if (TEST1){
@@ -214,7 +212,7 @@ int main(int argc, char** argv){
     }
 
     if (TEST6){
-        // Testing blocksize
+        // Testing OpenBLAS's mp and my mp.
         srand(time(NULL));
         double p = pow(2, 26) - 5;
         int bitsize_p = 26;
@@ -227,10 +225,10 @@ int main(int argc, char** argv){
         double* A_1D = convert_2D_to_1D(A, n);
         double* B_1D = convert_2D_to_1D(B, n);
         double* C = zero_matrix_1D(n*n);
-        double** D = zero_matrix_2D(n);
+        double* D = zero_matrix_1D(n*n);
 
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A_1D, n-1, B_1D,n, 1, C,n);
-        mp_ikj(A, B, D, n);
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,n,n,n, 1, A_1D, n, B_1D,n, 1, C,n);
+        mp_ikj(A_1D, B_1D, D, n);
 
         print_matrix_2D(A, n);
         printf("\n");
@@ -238,17 +236,17 @@ int main(int argc, char** argv){
         printf("\n");
         print_matrix_1D(C, n);
         printf("\n");
-        print_matrix_2D(D, n);
+        print_matrix_1D(D, n);
 
-        printf("C == D: %d \n", equals_matrix_2D_1D(D, C, n));
+        printf("C == D: %d \n", equals_matrix_1D_1D(D, C, n));
 
         delete_matrix_2D(&A, n);
         delete_matrix_2D(&B, n);
-        delete_matrix_2D(&D, n);
 
         delete_matrix_1D(&A_1D, n);
         delete_matrix_1D(&B_1D, n);
         delete_matrix_1D(&C, n);
+        delete_matrix_1D(&D, n);
 
     }
 
@@ -266,7 +264,7 @@ int main(int argc, char** argv){
 
         printf("A[%d] = %f \n", n*n, A_1D[n*n]);
         printf("A[%d] = %f \n", n*n+1, A_1D[n*n+1]);
-        A_1D[n*n] = -1;
+        // A_1D[n*n] = -1;
         print_matrix_1D(A_1D, n);
         print_matrix_1D(B_1D, n);
 
@@ -313,7 +311,7 @@ int main(int argc, char** argv){
         double* B_1D = convert_2D_to_1D(B, n);
         double* C = zero_matrix_1D(n*n);
         double* D = zero_matrix_1D(n*n);
-        double** E = zero_matrix_2D(n);
+        double* E = zero_matrix_1D(n*n);
 
         printf("Matrix A: \n");
         print_matrix_1D(A_1D, n);
@@ -322,14 +320,14 @@ int main(int argc, char** argv){
 
         mp_block_BLAS(A_1D, B_1D, C, n, p, u_overline, b);
         mp_block(A_1D, B_1D, D, n, p, u_overline, b);
-        mp_kij(A, B, E, n);
+        mp_kij(A_1D, B_1D, E, n);
 
         printf("Matrix C: \n");
         print_matrix_1D(C, n);
         printf("Matrix D: \n");
         print_matrix_1D(D, n);
         printf("Matrix E: \n");
-        print_matrix_2D(E, n);
+        print_matrix_1D(E, n);
 
         delete_matrix_2D(&A, n);
         delete_matrix_2D(&B, n);
@@ -338,6 +336,7 @@ int main(int argc, char** argv){
         delete_matrix_1D(&B_1D, n);
         delete_matrix_1D(&C, n);
         delete_matrix_1D(&D, n);
+        delete_matrix_1D(&E, n);
 
     }
 

@@ -4,69 +4,69 @@
 
 
 // Matrix Product with different order of loops.
-double benchmark_ijk(double** A, double** B, int n){
-    double** C = zero_matrix_2D(n);
+double benchmark_ijk(double* A, double* B, int n){
+    double* C = zero_matrix_1D(n*n);
 
     clock_t initial = clock();
     mp_ijk(A, B, C, n);
     clock_t final = clock();
 
-    delete_matrix_2D(&C, n);
+    delete_matrix_1D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
-double benchmark_kij(double** A, double** B, int n){
-    double** C = zero_matrix_2D(n);
+double benchmark_kij(double* A, double* B, int n){
+    double* C = zero_matrix_1D(n*n);
 
     clock_t initial = clock();
     mp_kij(A, B, C, n);
     clock_t final = clock();
 
-    delete_matrix_2D(&C, n);
+    delete_matrix_1D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
-double benchmark_jki(double** A, double** B, int n){
-    double** C = zero_matrix_2D(n);
+double benchmark_jki(double* A, double* B, int n){
+    double* C = zero_matrix_1D(n*n);
 
     clock_t initial = clock();
     mp_jki(A, B, C, n);
     clock_t final = clock();
 
-    delete_matrix_2D(&C, n);
+    delete_matrix_1D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
-double benchmark_ikj(double** A, double** B, int n){
-    double** C = zero_matrix_2D(n);
+double benchmark_ikj(double* A, double* B, int n){
+    double* C = zero_matrix_1D(n*n);
 
     clock_t initial = clock();
     mp_ikj(A, B, C, n);
     clock_t final = clock();
 
-    delete_matrix_2D(&C, n);
+    delete_matrix_1D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
-double benchmark_jik(double** A, double** B, int n){
-    double** C = zero_matrix_2D(n);
+double benchmark_jik(double* A, double* B, int n){
+    double* C = zero_matrix_1D(n*n);
 
     clock_t initial = clock();
     mp_jik(A, B, C, n);
     clock_t final = clock();
 
-    delete_matrix_2D(&C, n);
+    delete_matrix_1D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
-double benchmark_kji(double** A, double** B, int n){
-    double** C = zero_matrix_2D(n);
+double benchmark_kji(double* A, double* B, int n){
+    double* C = zero_matrix_1D(n*n);
 
     clock_t initial = clock();
     mp_kji(A, B, C, n);
     clock_t final = clock();
 
-    delete_matrix_2D(&C, n);
+    delete_matrix_1D(&C, n);
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
@@ -253,7 +253,7 @@ void benchmark_loops_order(double p){
     /* Benchmarking the order of loops.
     The most efficient one is IKJ.
     */
-    int m = 5;  // Executes m times each algo
+    int m = 3;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
         double sum_ijk = 0;
@@ -264,8 +264,8 @@ void benchmark_loops_order(double p){
         double sum_kji = 0;
 
         for (int j=0; j<m; j++){
-            double**A = random_matrix_2D(n, p);
-            double**B = random_matrix_2D(n, p);
+            double* A = random_matrix_1D(n, p);
+            double* B = random_matrix_1D(n, p);
             sum_ijk += benchmark_ijk(A, B, n);
             sum_kij += benchmark_kij(A, B, n);
             sum_jki += benchmark_jki(A, B, n);
@@ -273,8 +273,8 @@ void benchmark_loops_order(double p){
             sum_jik += benchmark_jik(A, B, n);
             sum_kji += benchmark_kji(A, B, n);
 
-            delete_matrix_2D(&A, n);
-            delete_matrix_2D(&B, n);
+            delete_matrix_1D(&A, n);
+            delete_matrix_1D(&B, n);
         }
         printf("\n");
         write_benchmark_time("data/benchmark_order_ijk.txt", "IJK", n, sum_ijk/m);
@@ -448,9 +448,8 @@ int main(){
 
 
     // Benchmarking order of loop.
-    // 07/07/23 13:27 I did a benchmark for 5
-    // clean_file_loops();
-    // benchmark_loops_order(p);
+    clean_file_loops();
+    benchmark_loops_order(p);
 
     // Benchmarking different modulos.
     // clean_file_modulos();
@@ -461,8 +460,8 @@ int main(){
     // benchmark_modulos_MP(p, u, u_overline, u_b);
 
     // Benchmarking blocks.
-    clean_file_blocks();
-    benchmark_blocks(p, u_overline);
+    // clean_file_blocks();
+    // benchmark_blocks(p, u_overline);
 
 
     return 0;

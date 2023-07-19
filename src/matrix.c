@@ -294,6 +294,21 @@ int equals_matrix_2D_1D(double** A, double* B, int n){
     return res;
 }
 
+int equals_matrix_1D_1D(double* A, double* B, int n){
+    /* Check if A equals B. The return values are:
+    0: different
+    1: equals
+    */
+    for (int i=0; i<n*n; i++){
+        if (A[i] != B[i]){
+            printf("A[%d] = %f \n", i, A[i]);
+            printf("B[%d] = %f \n", i, B[i]);
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int equals_matrix_file(char* filename1, char* filename2){
     /* Check if A equals B. The return values are:
     0: different

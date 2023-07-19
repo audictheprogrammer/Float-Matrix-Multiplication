@@ -34,12 +34,12 @@ void mp_block(double* A, double* B, double* C, int n, double p, double u, int bl
 void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, int b);
 
 
-void mp_ijk(double** A, double** B, double** C, int n);
-void mp_kij(double** A, double** B, double** C, int n);
-void mp_jki(double** A, double** B, double** C, int n);
-void mp_ikj(double** A, double** B, double** C, int n);
-void mp_jik(double** A, double** B, double** C, int n);
-void mp_kji(double** A, double** B, double** C, int n);
+void mp_ijk(double* A, double* B, double* C, int n);
+void mp_kij(double* A, double* B, double* C, int n);
+void mp_jki(double* A, double* B, double* C, int n);
+void mp_ikj(double* A, double* B, double* C, int n);
+void mp_jik(double* A, double* B, double* C, int n);
+void mp_kji(double* A, double* B, double* C, int n);
 
 
 #endif
