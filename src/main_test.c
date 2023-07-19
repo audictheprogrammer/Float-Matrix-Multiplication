@@ -31,7 +31,9 @@ int main(int argc, char** argv){
     const int TEST7 = 0;
     const int TEST8 = 0;
     const int TEST9 = 0;
-    const int TEST10 = 1;
+    const int TEST10 = 0;
+    const int TEST11 = 1;
+
 
 
     if (TEST1){
@@ -351,7 +353,9 @@ int main(int argc, char** argv){
         double u_overline = 1.0 / p;
         int n = 256;
         int bitsize_p = get_bitsize(p);
+        printf("Bitsize = %d \n", bitsize_p);
         int b = get_blocksize(bitsize_p, n);
+        printf("BLocksize = %d \n", b);
 
 
         for (int i=0; i<10; i++){
@@ -410,7 +414,7 @@ int main(int argc, char** argv){
         u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
         fesetround(FE_TONEAREST);
 
-        int n = 100;
+        int n = 256;
 
         for (int i=0; i<10; i++){
 
@@ -423,10 +427,10 @@ int main(int argc, char** argv){
             double**G = zero_matrix_2D(n);  // Barrett
 
 
-            mp_naive(A, B, C, n, p);
-            mp_SIMD1_MP(A, B, D, n, p, u);
+            mp_naive_MP(A, B, C, n, p);
+            mp_SIMD1(A, B, D, n, p, u);
             mp_SIMD2_MP(A, B, E, n, p, u_overline);
-            mp_SIMD3(A, B, F, n, p, u_overline);
+            mp_SIMD3_MP(A, B, F, n, p, u_overline);
             mp_Barrett_MP(A, B, G, n, p, u_b);
 
 
@@ -461,7 +465,6 @@ int main(int argc, char** argv){
 
         printf("Tests passed \n");
     }
-
 
 
     return 0;

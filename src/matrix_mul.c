@@ -44,6 +44,7 @@ u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u){
     Hypothesis: nonnegative numbers, and no assumption on p.
     Returns a % p
     */
+    // Constants works only for p < 2^26
     u_int32_t s = 23;
     u_int32_t t = 33;
 
@@ -157,19 +158,17 @@ void mp_Barrett(double** A, double** B, double** C, int n, double p, u_int32_t u
 // OpenMP
 void mp_naive_MP(double** A, double** B, double** C, int n, double p){
     // Assert C is a zero matrix.
-    for (int i=0; i<n; i++){
-        for (int k=0; k<n; k++){
-            #pragma omp parallel for
+    for (int k=0; k<n; k++){
+        #pragma omp parallel for
+        for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
                     C[i][j] = C[i][j] + modulo_naive(A[i][k] * B[k][j], p);
-                    // double temp = modulo_naive(A[i][k] * B[k][j], p);
-                    // C[i][j] += temp;
             }
         }
     }
 
+    #pragma omp parallel for
     for (int i=0; i<n; i++){
-        #pragma omp parallel for
         for (int j=0; j<n; j++){
             C[i][j] = modulo_naive(C[i][j], p);
         }
@@ -179,19 +178,17 @@ void mp_naive_MP(double** A, double** B, double** C, int n, double p){
 
 void mp_SIMD1_MP(double** A, double** B, double** C, int n, double p, double u){
     // Assert C is a zero matrix
-    for (int i=0; i<n; i++){
-        for (int k=0; k<n; k++){
-            #pragma omp parallel for
+    for (int k=0; k<n; k++){
+        #pragma omp parallel for
+        for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
                 C[i][j] = C[i][j] + modulo_SIMD1(A[i][k] * B[k][j], p, u);
-                    // double temp = modulo_SIMD1(A[i][k] * B[k][j], p, u);
-                    // C[i][j] += temp;
             }
         }
     }
 
+    #pragma omp parallel for
     for (int i=0; i<n; i++){
-        #pragma omp parallel for
         for (int j=0; j<n; j++){
                 C[i][j] = modulo_SIMD1(C[i][j], p, u);
         }
@@ -201,19 +198,17 @@ void mp_SIMD1_MP(double** A, double** B, double** C, int n, double p, double u){
 
 void mp_SIMD2_MP(double** A, double** B, double** C, int n, double p, double u){
     // Assert C is a zero matrix
-    for (int i=0; i<n; i++){
-        for (int k=0; k<n; k++){
+    for (int k=0; k<n; k++){
+        for (int i=0; i<n; i++){
             #pragma omp parallel for
             for (int j=0; j<n; j++){
                     C[i][j] = C[i][j] + modulo_SIMD2(A[i][k] * B[k][j], p, u);
-                    // double temp = modulo_SIMD2(A[i][k] * B[k][j], p, u);
-                    // C[i][j] += temp;
             }
         }
     }
 
+    #pragma omp parallel for
     for (int i=0; i<n; i++){
-        #pragma omp parallel for
         for (int j=0; j<n; j++){
                 C[i][j] = modulo_SIMD2(C[i][j], p, u);
         }
@@ -223,19 +218,17 @@ void mp_SIMD2_MP(double** A, double** B, double** C, int n, double p, double u){
 
 void mp_SIMD3_MP(double** A, double** B, double** C, int n, double p, double u){
     // Assert C is a zero matrix
-    for (int i=0; i<n; i++){
-        for (int k=0; k<n; k++){
-            #pragma omp parallel for
+    for (int k=0; k<n; k++){
+        #pragma omp parallel for
+        for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
                     C[i][j] = C[i][j] + modulo_SIMD3(A[i][k] * B[k][j], p, u);
-                    // double temp = modulo_SIMD3(A[i][k] * B[k][j], p, u);
-                    // C[i][j] += temp;
             }
         }
     }
 
+    #pragma omp parallel for
     for (int i=0; i<n; i++){
-        #pragma omp parallel for
         for (int j=0; j<n; j++){
             C[i][j] = modulo_SIMD3(C[i][j], p, u);
         }
@@ -246,19 +239,17 @@ void mp_SIMD3_MP(double** A, double** B, double** C, int n, double p, double u){
 
 void mp_Barrett_MP(double** A, double** B, double** C, int n, double p, u_int32_t u){
     // Assert C is a zero matrix
-    for (int i=0; i<n; i++){
-        for (int k=0; k<n; k++){
-            #pragma omp parallel for
+    for (int k=0; k<n; k++){
+        #pragma omp parallel for
+        for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
                 C[i][j] = C[i][j] + modulo_Barrett(A[i][k] * B[k][j], p, u);
-                    // double temp = modulo_Barrett(A[i][k] * B[k][j], p, u);
-                    // C[i][j] += temp;
             }
         }
     }
 
+    #pragma omp parallel for
     for (int i=0; i<n; i++){
-        #pragma omp parallel for
         for (int j=0; j<n; j++){
             C[i][j] = modulo_Barrett(C[i][j], p, u);
         }
@@ -269,45 +260,69 @@ void mp_Barrett_MP(double** A, double** B, double** C, int n, double p, u_int32_
 
 
 void mp_block(double* A, double* B, double* C, int n, double p, double u, int b){
-    /* Compute the product of two 1D matrices using block product.
-    Without OpenBLAS.
+    /* Compute the product of two matrices using basic block product.
+    It allows to reduce the amount of modulo needed.
     */
-    for (int i=0; i<n; i+=b){
-        for (int k=0; k<n; k+=b){
-            for (int j=0; j<n; j+=b){
 
-                for (int ii=i; ii<i+b; ii++){
-                    for (int jj=j; jj<j+b; jj++){
-                        for (int kk=k; kk<k+b; kk++){
-                            C[ii*n + jj] += A[ii*n + kk] * B[kk*n + jj];
-                        }
-                        C[ii*n + jj] = modulo_SIMD2(C[ii*n + jj], p, u);
-                    }
+    for (int k=0; k<n; k+=b){
+
+        for (int kk=k; kk<k+b; kk++){
+            for(int ii=0; ii<n; ii++){
+                for (int jj=0; jj<n; jj++){
+                    C[ii*n + jj] += A[ii*n + kk] * B[kk*n + jj];
                 }
             }
         }
+
+        for (int i=0; i<n; i++){
+            for (int j=0; j<n; j++){
+                C[i*n + j] = modulo_SIMD2(C[i*n + j], p, u);
+            }
+        }
+
     }
 
 }
 
 void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, int b){
-    for (int i=0; i<n; i+=b){
-        for (int k=0; k<n; k+=b){
-            for (int j=0; j<n; j+=b){
-                // Block
-                // printf("i*n+k = %d \n", i*n+k);
-                // printf("k*n+j = %d \n", k*n+j);
-                cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
-                            b, b, b, 1, A + (i*n + k), n, B + (k*n + j),
-                            n, 1, C + (i*n + j), n);
-                for (int ii=i; ii<i+b; ii++){
-                    for (int jj=j; jj<j+b; jj++){
-                        C[ii*n + jj] = modulo_SIMD2(C[ii*n + jj], p, u);
-                    }
-                }
+    /* Compute the product of two matrices using OpenBLAS's block product.
+    It allows to reduce the amount of modulo needed.
+    */
+
+    for (int k=0; k<n; k+=b){
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
+                    n, n, b, 1, A + k, n, B + n*k, n,
+                    1, C, n);
+
+        for (int i=0; i<n; i++){
+            for (int j=0; j<n; j++){
+                C[i*n + j] = modulo_SIMD2(C[i*n + j], p, u);
             }
         }
+
     }
+
+}
+
+void mp_block_BLAS_MP(double* A, double* B, double* C, int n, double p, double u, int b){
+    /* Compute the product of two matrices using OpenBLAS's block product.
+    It allows to reduce the amount of modulo needed.
+    */
+
+    for (int k=0; k<n; k+=b){
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
+                    n, n, b, 1, A + k, n, B + n*k, n,
+                    1, C, n);
+
+
+        for (int i=0; i<n; i++){
+            for (int j=0; j<n; j++){
+                C[i*n + j] = modulo_SIMD2(C[i*n + j], p, u);
+            }
+        }
+
+    }
+
 }
 
 
@@ -316,17 +331,14 @@ int get_bitsize(double p){
     Bitsize < 26 because we work with doubles and product.
     */
     double MAX = pow(2, 26);
-    if (p >= MAX)
-        return -1;
-    if (p <= 0)
-        return -1;
-    int n = 1;
-    for (int i = 1; i<26; i++){
-        n = n*2;
-        if (p < n)
-            return i;
+
+    for (int i = 26; i > 0; i--){
+        if (p > MAX){
+            return i+1;  // res = 2^i forall i
+        }
+        MAX /= 2;
     }
-    return 26;
+    return 0;
 }
 
 int get_blocksize(int b, int n){

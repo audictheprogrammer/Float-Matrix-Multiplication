@@ -226,13 +226,18 @@ double benchmark_blocks_NoBLAS(double* A, double* B, int n, double p, double u, 
 
 double benchmark_blocks_BLAS(double* A, double* B, int n, double p, double u, int b){
     double* C = zero_matrix_1D(n*n);
+    struct timespec initial, final;
+    double elapsed;
 
-    clock_t initial = clock();
+    clock_gettime(CLOCK_MONOTONIC, &initial);
     mp_block_BLAS(A, B, C, n, p, u, b);
-    clock_t final = clock();
+    clock_gettime(CLOCK_MONOTONIC, &final);
+
+    elapsed = (final.tv_sec - initial.tv_sec);
+    elapsed += (final.tv_nsec - initial.tv_nsec) / 1000000000.0;
 
     delete_matrix_1D(&C, n);
-    return ((double) (final - initial)) / CLOCKS_PER_SEC;
+    return elapsed;
 }
 
 
@@ -351,7 +356,7 @@ void benchmark_modulos_MP(double p, double u, double u_overline, double u_b){
     /* Benchmarking different modulos.
     The most efficient one SIMD2.
     */
-    int m = 1;  // Executes m times each algo
+    int m = 5;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
 
@@ -375,11 +380,11 @@ void benchmark_modulos_MP(double p, double u, double u_overline, double u_b){
         }
 
         printf("\n");
-        write_benchmark_time("data/benchmark_modulo_MP_naive.txt", "Mod MP Naive", n, sum_mod_MP_naive);
-        write_benchmark_time("data/benchmark_modulo_MP_SIMD1.txt", "Mod MP SIMD1", n, sum_mod_MP_SIMD1);
-        write_benchmark_time("data/benchmark_modulo_MP_SIMD2.txt", "Mod MP SIMD2", n, sum_mod_MP_SIMD2);
-        write_benchmark_time("data/benchmark_modulo_MP_SIMD3.txt", "Mod MP SIMD3", n, sum_mod_MP_SIMD3);
-        write_benchmark_time("data/benchmark_modulo_MP_Barrett.txt", "Mod MP Barrett", n, sum_mod_MP_Barrett);
+        write_benchmark_time("data/benchmark_modulo_MP_naive.txt", "Mod MP Naive", n, sum_mod_MP_naive/m);
+        write_benchmark_time("data/benchmark_modulo_MP_SIMD1.txt", "Mod MP SIMD1", n, sum_mod_MP_SIMD1/m);
+        write_benchmark_time("data/benchmark_modulo_MP_SIMD2.txt", "Mod MP SIMD2", n, sum_mod_MP_SIMD2/m);
+        write_benchmark_time("data/benchmark_modulo_MP_SIMD3.txt", "Mod MP SIMD3", n, sum_mod_MP_SIMD3/m);
+        write_benchmark_time("data/benchmark_modulo_MP_Barrett.txt", "Mod MP Barrett", n, sum_mod_MP_Barrett/m);
 
     }
 }
@@ -452,12 +457,12 @@ int main(){
     // benchmark_modulos(p, u, u_overline, u_b);
 
     // Benchmarking different modulos with OpenMP
-    clean_file_modulos_MP();
-    benchmark_modulos_MP(p, u, u_overline, u_b);
+    // clean_file_modulos_MP();
+    // benchmark_modulos_MP(p, u, u_overline, u_b);
 
     // Benchmarking blocks.
-    // clean_file_blocks();
-    // benchmark_blocks(p, u_overline);
+    clean_file_blocks();
+    benchmark_blocks(p, u_overline);
 
 
     return 0;
