@@ -270,7 +270,7 @@ void benchmark_loops_order(double p){
     /* Benchmarking the order of loops.
     The most efficient one is IKJ.
     */
-    int m = 3;  // Executes m times each algo
+    int m = 1;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
         double sum_ijk = 0;
@@ -308,7 +308,7 @@ void benchmark_modulos(double p, double u, double u_overline, double u_b){
     /* Benchmarking different modulos.
     The most efficient one SIMD2.
     */
-    int m = 3;  // Executes m times each algo
+    int m = 1;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
         double sum_mod_naive = 0;
@@ -344,7 +344,7 @@ void benchmark_modulos_MP(double p, double u, double u_overline, double u_b){
     /* Benchmarking different modulos.
     The most efficient one SIMD2.
     */
-    int m = 3;  // Executes m times each algo
+    int m = 1;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
 
@@ -381,7 +381,7 @@ void benchmark_modulos_MP(double p, double u, double u_overline, double u_b){
 void benchmark_blocks(double p, double u_overline){
     /* Benchmarking different modulos.
     */
-    int m = 3;  // Executes m times each algo
+    int m = 1;  // Executes m times each algo
     for (int i=8; i<11; i++){
         int n = (int) pow(2, i);
         int b = get_blocksize(get_bitsize(p), n);
@@ -508,15 +508,15 @@ int main(){
     // benchmark_modulos(p, u, u_overline, u_b);
 
     // Benchmarking different modulos with OpenMP
-    clean_file_modulos_MP();
-    benchmark_modulos_MP(p, u, u_overline, u_b);
+    // clean_file_modulos_MP();
+    // benchmark_modulos_MP(p, u, u_overline, u_b);
 
     // Benchmarking blocks.
-    // clean_file_blocks();
-    // benchmark_blocks(p, u_overline);
+    clean_file_blocks();
+    benchmark_blocks(p, u_overline);
 
-    clean_file_blocks_MP();
-    benchmark_blocks_MP(p, u_overline);
+    // clean_file_blocks_MP();
+    // benchmark_blocks_MP(p, u_overline);
 
 
     return 0;

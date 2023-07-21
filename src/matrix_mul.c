@@ -199,8 +199,8 @@ void mp_SIMD1_MP(double* A, double* B, double* C, int n, double p, double u){
 void mp_SIMD2_MP(double* A, double* B, double* C, int n, double p, double u){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
+        #pragma omp parallel for
         for (int i=0; i<n; i++){
-            #pragma omp parallel for
             for (int j=0; j<n; j++){
                     C[i*n + j] = C[i*n + j] + modulo_SIMD2(A[i*n + k] * B[k*n + j], p, u);
             }
@@ -274,10 +274,8 @@ void mp_block(double* A, double* B, double* C, int n, double p, double u, int b)
             }
         }
 
-        for (int i=0; i<n; i++){
-            for (int j=0; j<n; j++){
-                C[i*n + j] = modulo_SIMD3(C[i*n + j], p, u);
-            }
+        for (int i=0; i<n*n; i++){
+            C[i] = modulo_SIMD3(C[i], p, u);
         }
 
     }
@@ -288,16 +286,15 @@ void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, i
     /* Compute the product of two matrices using OpenBLAS's block product.
     It allows to reduce the amount of modulo needed.
     */
-
+    openblas_set_num_threads(1);  // 8 is slower than 1.
     for (int k=0; k<n; k+=b){
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     n, n, b, 1, A + k, n, B + n*k, n,
                     1, C, n);
 
-        for (int i=0; i<n; i++){
-            for (int j=0; j<n; j++){
-                C[i*n + j] = modulo_SIMD3(C[i*n + j], p, u);
-            }
+
+        for (int i=0; i<n*n; i++){
+            C[i] = modulo_SIMD3(C[i], p, u);
         }
 
     }
@@ -306,19 +303,16 @@ void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, i
 
 void mp_block_BLAS_MP(double* A, double* B, double* C, int n, double p, double u, int b){
     /* Compute the product of two matrices using OpenBLAS's block product.
-    It allows to reduce the amount of modulo needed.
+    It allows us to reduce the amount of modulo needed.
     */
-
     for (int k=0; k<n; k+=b){
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     n, n, b, 1, A + k, n, B + n*k, n,
                     1, C, n);
 
         #pragma omp parallel for
-        for (int i=0; i<n; i++){
-            for (int j=0; j<n; j++){
-                C[i*n + j] = modulo_SIMD3(C[i*n + j], p, u);
-            }
+        for (int i=0; i<n*n; i++){
+            C[i] = modulo_SIMD3(C[i], p, u);
         }
 
     }
