@@ -52,20 +52,6 @@ u_int32_t* zero_matrix_1D_integer(int n){
 }
 
 
-// u_int64_t* zero_matrix_1D_integer64(int n){
-//     u_int64_t* mat = (u_int64_t*) malloc(sizeof(u_int64_t) * n*n);
-//     if (mat == NULL){
-//         printf("Malloc error !\n");
-//         return NULL;
-//     }
-//     for (int i = 0; i < n*n; i++){
-//         mat[i] = 0;
-//     }
-//
-//     return mat;
-//
-// }
-
 double** random_matrix_2D(int n, double p){
     /* Create a 2 dimensional square matrix and fill
     with numbers between 0 and p-1. */
@@ -147,15 +133,6 @@ u_int32_t* convert_float_to_integer(double* A, int n){
     }
     return mat;
 }
-
-// u_int64_t* convert_integer32_to_integer64(u_int32_t* A, int n){
-//
-//     u_int64_t* mat = zero_matrix_1D_integer64(n);
-//     for (int i=0; i<n*n; i++){
-//         mat[i] = (u_int64_t) A[i];
-//     }
-//     return mat;
-// }
 
 
 void delete_matrix_2D(double*** mat, int n){
@@ -481,23 +458,6 @@ int equals_matrix_integer_integer(u_int32_t* A, u_int32_t* B, int n){
     }
     return 1;
 }
-
-//
-// int equals_matrix_float_integer64(double* A, u_int64_t* B, int n){
-//     /* Check if A equals B. The return values are:
-//     0: different
-//     1: equals
-//     */
-//     for (int i=0; i<n*n; i++){
-//         if (A[i] != B[i]){
-//             printf("A[%d] = %f \n", i, A[i]);
-//             printf("B[%d] = %ld \n", i, B[i]);
-//             return 0;
-//         }
-//     }
-//     return 1;
-//
-// }
 
 
 int equals_matrix_file(char* filename1, char* filename2){

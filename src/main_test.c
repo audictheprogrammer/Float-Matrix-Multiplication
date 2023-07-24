@@ -22,7 +22,7 @@
 // }
 
 int main(int argc, char** argv){
-    const int TEST1 = 1;
+    const int TEST1 = 0;
     const int TEST2 = 0;
     const int TEST3 = 0;
     const int TEST4 = 0;
@@ -45,9 +45,7 @@ int main(int argc, char** argv){
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
         fesetround(FE_TONEAREST);
         u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
-        // u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
 
-        // double a = 34253647533243141;
         double a = 150007655597277077;
 
         double SIMD1 = modulo_SIMD1(a, p, u);
