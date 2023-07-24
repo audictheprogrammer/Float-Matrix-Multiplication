@@ -45,8 +45,8 @@ u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u){
     Returns a % p
     */
     // Constants works only for p < 2^26
-    u_int32_t s = 23;
-    u_int32_t t = 33;
+    u_int32_t s = 22;
+    u_int32_t t = 32;
 
     u_int64_t b = a >> s;
     u_int64_t c = (b * u) >> t; // u = 2^(s+t) / p
@@ -59,8 +59,8 @@ u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u){
 
 void mp_naive(double* A, double* B, double* C, int n, double p){
     // Assert C is a zero matrix.
-    for (int i=0; i<n; i++){
-        for (int k=0; k<n; k++){
+    for (int k=0; k<n; k++){
+        for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
                 double temp = modulo_naive(A[i*n + k] * B[k*n + j], p);
                 C[i*n + j] += temp;
@@ -74,12 +74,14 @@ void mp_naive(double* A, double* B, double* C, int n, double p){
         }
     }
 
+
+
 }
 
 void mp_SIMD1(double* A, double* B, double* C, int n, double p, double u){
     // Assert C is a zero matrix
-    for (int i=0; i<n; i++){
-        for (int k=0; k<n; k++){
+    for (int k=0; k<n; k++){
+        for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
                 double temp = modulo_SIMD1(A[i*n + k] * B[k*n + j], p, u);
                 C[i*n + j] += temp;
@@ -97,8 +99,8 @@ void mp_SIMD1(double* A, double* B, double* C, int n, double p, double u){
 
 void mp_SIMD2(double* A, double* B, double* C, int n, double p, double u){
     // Assert C is a zero matrix
-    for (int i=0; i<n; i++){
-        for (int k=0; k<n; k++){
+    for (int k=0; k<n; k++){
+        for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
                 double temp = modulo_SIMD2(A[i*n + k] * B[k*n + j], p, u);
                 C[i*n + j] += temp;
@@ -116,8 +118,8 @@ void mp_SIMD2(double* A, double* B, double* C, int n, double p, double u){
 
 void mp_SIMD3(double* A, double* B, double* C, int n, double p, double u){
     // Assert C is a zero matrix
-    for (int i=0; i<n; i++){
-        for (int k=0; k<n; k++){
+    for (int k=0; k<n; k++){
+        for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
                 double temp = modulo_SIMD3(A[i*n + k] * B[k*n + j], p, u);
                 C[i*n + j] += temp;
@@ -136,8 +138,8 @@ void mp_SIMD3(double* A, double* B, double* C, int n, double p, double u){
 
 void mp_Barrett(double* A, double* B, double* C, int n, double p, u_int32_t u){
     // Assert C is a zero matrix
-    for (int i=0; i<n; i++){
-        for (int k=0; k<n; k++){
+    for (int k=0; k<n; k++){
+        for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
                 double temp = modulo_Barrett(A[i*n + k] * B[k*n + j], p, u);
                 C[i*n + j] += temp;
@@ -159,16 +161,16 @@ void mp_Barrett(double* A, double* B, double* C, int n, double p, u_int32_t u){
 void mp_naive_MP(double* A, double* B, double* C, int n, double p){
     // Assert C is a zero matrix.
     for (int k=0; k<n; k++){
-        #pragma omp parallel for
         for (int i=0; i<n; i++){
+            #pragma omp parallel for
             for (int j=0; j<n; j++){
                     C[i*n + j] = C[i*n + j] + modulo_naive(A[i*n + k] * B[k*n + j], p);
             }
         }
     }
 
-    #pragma omp parallel for
     for (int i=0; i<n; i++){
+        #pragma omp parallel for
         for (int j=0; j<n; j++){
             C[i*n + j] = modulo_naive(C[i*n + j], p);
         }
@@ -179,16 +181,16 @@ void mp_naive_MP(double* A, double* B, double* C, int n, double p){
 void mp_SIMD1_MP(double* A, double* B, double* C, int n, double p, double u){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
-        #pragma omp parallel for
         for (int i=0; i<n; i++){
+            #pragma omp parallel for
             for (int j=0; j<n; j++){
                 C[i*n + j] = C[i*n + j] + modulo_SIMD1(A[i*n + k] * B[k*n + j], p, u);
             }
         }
     }
 
-    #pragma omp parallel for
     for (int i=0; i<n; i++){
+        #pragma omp parallel for
         for (int j=0; j<n; j++){
                 C[i*n + j] = modulo_SIMD1(C[i*n + j], p, u);
         }
@@ -199,16 +201,16 @@ void mp_SIMD1_MP(double* A, double* B, double* C, int n, double p, double u){
 void mp_SIMD2_MP(double* A, double* B, double* C, int n, double p, double u){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
-        #pragma omp parallel for
         for (int i=0; i<n; i++){
+            #pragma omp parallel for
             for (int j=0; j<n; j++){
                     C[i*n + j] = C[i*n + j] + modulo_SIMD2(A[i*n + k] * B[k*n + j], p, u);
             }
         }
     }
 
-    #pragma omp parallel for
     for (int i=0; i<n; i++){
+        #pragma omp parallel for
         for (int j=0; j<n; j++){
                 C[i*n + j] = modulo_SIMD2(C[i*n + j], p, u);
         }
@@ -219,16 +221,16 @@ void mp_SIMD2_MP(double* A, double* B, double* C, int n, double p, double u){
 void mp_SIMD3_MP(double* A, double* B, double* C, int n, double p, double u){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
-        #pragma omp parallel for
         for (int i=0; i<n; i++){
+            #pragma omp parallel for
             for (int j=0; j<n; j++){
                     C[i*n + j] = C[i*n + j] + modulo_SIMD3(A[i*n + k] * B[k*n + j], p, u);
             }
         }
     }
 
-    #pragma omp parallel for
     for (int i=0; i<n; i++){
+        #pragma omp parallel for
         for (int j=0; j<n; j++){
             C[i*n + j] = modulo_SIMD3(C[i*n + j], p, u);
         }
@@ -240,16 +242,16 @@ void mp_SIMD3_MP(double* A, double* B, double* C, int n, double p, double u){
 void mp_Barrett_MP(double* A, double* B, double* C, int n, double p, u_int32_t u){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
-        #pragma omp parallel for
         for (int i=0; i<n; i++){
+            #pragma omp parallel for
             for (int j=0; j<n; j++){
                 C[i*n + j] = C[i*n + j] + modulo_Barrett(A[i*n + k] * B[k*n + j], p, u);
             }
         }
     }
 
-    #pragma omp parallel for
     for (int i=0; i<n; i++){
+        #pragma omp parallel for
         for (int j=0; j<n; j++){
             C[i*n + j] = modulo_Barrett(C[i*n + j], p, u);
         }
@@ -286,6 +288,7 @@ void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, i
     /* Compute the product of two matrices using OpenBLAS's block product.
     It allows to reduce the amount of modulo needed.
     */
+    printf("blocksize = %d \n", b);
     openblas_set_num_threads(1);  // 8 is slower than 1.
     for (int k=0; k<n; k+=b){
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
@@ -420,4 +423,27 @@ void mp_kji(double* A, double* B, double* C, int n){
             }
         }
     }
+}
+
+void mp_integer(u_int32_t* A, u_int32_t* B, u_int32_t* C, int n, u_int32_t p, u_int32_t u){
+    /* Matrix product using: Decomp Barrett and Trans */
+
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
+            u_int64_t h = 0;
+            u_int64_t l = 0;
+            for (int k = 0; k < n; k++){
+                u_int64_t temp = (u_int64_t) A[i*n + k] * B[j*n + k];
+                h += temp >> 32;
+                l += temp - ((temp >> 32) << 32);
+            }
+
+            u_int64_t t = 1;
+            u_int64_t h_rem = modulo_Barrett(h, p, u);
+            u_int64_t l_rem = modulo_Barrett(l, p, u);
+            C[i*n + j] = modulo_Barrett(h_rem * (t << 32) + l_rem, p, u);
+
+        }
+    }
+
 }

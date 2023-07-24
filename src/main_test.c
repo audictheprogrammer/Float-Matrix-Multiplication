@@ -22,7 +22,7 @@
 // }
 
 int main(int argc, char** argv){
-    const int TEST1 = 0;
+    const int TEST1 = 1;
     const int TEST2 = 0;
     const int TEST3 = 0;
     const int TEST4 = 0;
@@ -32,6 +32,7 @@ int main(int argc, char** argv){
     const int TEST8 = 0;
     const int TEST9 = 0;
     const int TEST10 = 0;
+    const int TEST11 = 1;
 
 
     if (TEST1){
@@ -39,14 +40,15 @@ int main(int argc, char** argv){
         double p = pow(2, 26) - 5;
 
         // Precomputed constants for Modular functions
-        fesetround(FE_TONEAREST);
         double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
         fesetround(FE_TONEAREST);
-        u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
+        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
+        // u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
 
-        double a = pow(2, 26);
+        // double a = 34253647533243141;
+        double a = 150007655597277077;
 
         double SIMD1 = modulo_SIMD1(a, p, u);
         double SIMD2 = modulo_SIMD2(a, p, u_overline);
@@ -55,7 +57,6 @@ int main(int argc, char** argv){
 
         printf("a = %f \n", a);
         printf("p = %f \n", p);
-        printf("Correct answer is 5.0 \n");
         printf("SIMD1 returns:%f \n", SIMD1);
         printf("SIMD2 returns:%f \n", SIMD2);
         printf("SIMD3 returns:%f \n", SIMD3);
@@ -68,12 +69,11 @@ int main(int argc, char** argv){
         double p = pow(2, 26) - 5;
 
         // Precomputed constants for Modular functions
-        fesetround(FE_TONEAREST);
         double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
         fesetround(FE_TONEAREST);
-        u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
+        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
 
         double a = (p-1) * (p-1) * 32;
 
@@ -97,12 +97,11 @@ int main(int argc, char** argv){
         double p = pow(2, 26) - 5;
 
         // Precomputed constants for Modular functions
-        fesetround(FE_TONEAREST);
         double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
         fesetround(FE_TONEAREST);
-        u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
+        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
 
         double a = (p-1) * (p-1) * 16;  // a > 2^(25+25+4) = 2^54
 
@@ -131,7 +130,7 @@ int main(int argc, char** argv){
         double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
-        u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
+        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
         fesetround(FE_TONEAREST);
 
         int n = 1;
@@ -336,6 +335,7 @@ int main(int argc, char** argv){
         // Precomputed constants for Modular and Blocking functions.
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;
+        fesetround(FE_TONEAREST);
         int n = 256;
         int bitsize_p = get_bitsize(p);
         printf("Bitsize = %d \n", bitsize_p);
@@ -388,14 +388,13 @@ int main(int argc, char** argv){
         double p = pow(2, 26) - 5;
 
         // Precomputed constants for Modular functions
-        fesetround(FE_TONEAREST);
         double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
-        u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
         fesetround(FE_TONEAREST);
+        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
 
-        int n = 256;
+        int n = 128;
 
         for (int i=0; i<10; i++){
 
@@ -445,6 +444,68 @@ int main(int argc, char** argv){
         }
 
         printf("Tests passed \n");
+    }
+
+    if (TEST11){
+        // Test for integer matrix product
+        srand(time(NULL));
+        double p = pow(2, 26) - 5;
+
+        // Precomputed constants for Modular functions
+        fesetround(FE_UPWARD);
+        double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
+        fesetround(FE_TONEAREST);
+        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
+
+        int n = 512;
+        int bitsize_p = get_bitsize(p);
+        int b = get_blocksize(bitsize_p, n);
+
+        double* A = random_matrix_1D(n, p);
+        double* B = random_matrix_1D(n, p);
+        u_int32_t* A_int = convert_float_to_integer(A, n);
+        u_int32_t* B_temp = convert_float_to_integer(B, n);
+        u_int32_t* B_int = transpose_matrix_integer(B_temp, n);
+
+
+        double* C = zero_matrix_1D(n);
+        u_int32_t* D = zero_matrix_1D_integer(n);
+        // u_int32_t* D = zero_matrix_1D_integer(n);
+
+        // PRODUCT STARTS **********************************
+        mp_naive(A, B, C, n, p);
+        mp_integer(A_int, B_int, D, n, p, u_b);
+        // PRODUCT ENDS ************************************
+
+        // printf("Matrix A: \n");
+        // print_matrix_1D_integer(A_int, n);
+        // printf("Matrix B: \n");
+        // print_matrix_1D_integer(B_int, n);
+        //
+        // printf("Matrix C: \n");
+        // print_matrix_1D(C, n);
+        // printf("Matrix D: \n");
+        // print_matrix_1D_integer(D, n);
+
+        write_matrix_1D_integer(A_int, n, "data/Matrix_A.txt");
+        write_matrix_1D_integer(B_int, n, "data/Matrix_B.txt");
+        write_matrix_1D(C, n, "data/Matrix_C.txt");  // Double
+        write_matrix_1D_integer(D, n, "data/Matrix_D.txt");  // Integer
+
+
+        int nb1 = equals_matrix_float_integer(C, D, n);
+
+        delete_matrix_1D(&A, n);
+        delete_matrix_1D_integer(&A_int, n);
+        delete_matrix_1D(&B, n);
+        delete_matrix_1D_integer(&B_temp, n);
+        delete_matrix_1D_integer(&B_int, n);
+        delete_matrix_1D(&C, n);
+        delete_matrix_1D_integer(&D, n);
+
+        assert(nb1==1);
+        printf("Test passed \n");
+
     }
 
 

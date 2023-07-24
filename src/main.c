@@ -496,7 +496,7 @@ int main(){
     fesetround(FE_UPWARD);
     double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
     fesetround(FE_TONEAREST);
-    u_int32_t u_b = (int) (pow(2, 56) / p);  // Constant for Barrett
+    u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
 
 
     // Benchmarking order of loop.
@@ -512,8 +512,8 @@ int main(){
     // benchmark_modulos_MP(p, u, u_overline, u_b);
 
     // Benchmarking blocks.
-    clean_file_blocks();
-    benchmark_blocks(p, u_overline);
+    // clean_file_blocks();
+    // benchmark_blocks(p, u_overline);
 
     // clean_file_blocks_MP();
     // benchmark_blocks_MP(p, u_overline);

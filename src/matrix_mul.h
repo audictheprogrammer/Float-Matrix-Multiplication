@@ -30,6 +30,7 @@ void mp_SIMD3_MP(double* A, double* B, double* C, int n, double p, double u);
 void mp_Barrett_MP(double* A, double* B, double* C, int n, double p, u_int32_t u);
 
 
+
 void mp_block(double* A, double* B, double* C, int n, double p, double u, int blocksize);
 void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, int blocksize);
 void mp_block_BLAS_MP(double* A, double* B, double* C, int n, double p, double u, int blocksize);
@@ -42,5 +43,7 @@ void mp_ikj(double* A, double* B, double* C, int n);
 void mp_jik(double* A, double* B, double* C, int n);
 void mp_kji(double* A, double* B, double* C, int n);
 
-
+// void mp_integer(u_int64_t* A, u_int64_t* B, u_int64_t* C, int n, u_int32_t p, u_int32_t u);
+void mp_integer(u_int32_t* A, u_int32_t* B, u_int32_t* C, int n, u_int32_t p, u_int32_t u);
+void mp_integer_naive(u_int32_t* A, u_int32_t* B, u_int32_t* C, int n, u_int32_t p, u_int32_t u);
 #endif
