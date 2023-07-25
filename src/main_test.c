@@ -455,20 +455,19 @@ int main(int argc, char** argv){
         fesetround(FE_TONEAREST);
         u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
 
-        int n = 512;
+        int n = 128;
         int bitsize_p = get_bitsize(p);
         int b = get_blocksize(bitsize_p, n);
 
         double* A = random_matrix_1D(n, p);
         double* B = random_matrix_1D(n, p);
-        u_int32_t* A_int = convert_float_to_integer(A, n);
-        u_int32_t* B_temp = convert_float_to_integer(B, n);
-        u_int32_t* B_int = transpose_matrix_integer(B_temp, n);
 
+        u_int64_t* A_int = convert_float_to_integer(A, n);
+        u_int64_t* B_temp = convert_float_to_integer(B, n);
+        u_int64_t* B_int = transpose_matrix_integer(B_temp, n);
 
         double* C = zero_matrix_1D(n);
-        u_int32_t* D = zero_matrix_1D_integer(n);
-        // u_int32_t* D = zero_matrix_1D_integer(n);
+        u_int64_t* D = zero_matrix_1D_integer(n);
 
         // PRODUCT STARTS **********************************
         mp_naive(A, B, C, n, p);

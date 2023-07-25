@@ -38,8 +38,8 @@ double* zero_matrix_1D(int n){
     return mat;
 }
 
-u_int32_t* zero_matrix_1D_integer(int n){
-    u_int32_t* mat = (u_int32_t*) malloc(sizeof(u_int32_t) * n*n);
+u_int64_t* zero_matrix_1D_integer(int n){
+    u_int64_t* mat = (u_int64_t*) malloc(sizeof(u_int64_t) * n*n);
     if (mat == NULL){
         printf("Malloc error !\n");
         return NULL;
@@ -108,6 +108,7 @@ double** convert_1D_to_2D(double* A, int n){
     return mat;
 }
 
+
 double* convert_2D_to_1D(double** A, int n){
     /* Converts a 2 dimensional square matrix to
     a 1 dimensional matrix. */
@@ -123,11 +124,10 @@ double* convert_2D_to_1D(double** A, int n){
 }
 
 
-
-u_int32_t* convert_float_to_integer(double* A, int n){
+u_int64_t* convert_float_to_integer(double* A, int n){
     /* Converts the coeffients of a double matrix to u_int32_t matrix.
     */
-    u_int32_t* mat = zero_matrix_1D_integer(n);
+    u_int64_t* mat = zero_matrix_1D_integer(n);
     for (int i=0; i<n*n; i++){
         mat[i] = (int) A[i];
     }
@@ -158,7 +158,7 @@ void delete_matrix_1D(double** mat, int n){
     *mat = NULL;
 }
 
-void delete_matrix_1D_integer(u_int32_t** mat, int n){
+void delete_matrix_1D_integer(u_int64_t** mat, int n){
     /* Delete the 1D matrix and set it to NULL*/
     if (*mat == NULL){
         printf("Matrix is NULL cannot delete !\n");
@@ -169,24 +169,9 @@ void delete_matrix_1D_integer(u_int32_t** mat, int n){
 }
 
 
-
-double** transpose_matrix(double** mat, int n){
-    /* Tranpose a matrix */
-    double** mat_t = zero_matrix_2D(n);
-    if (mat_t == NULL){
-        printf("Cannot transpose the matrix !\n");
-    }
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < n; j++){
-            mat_t[i][j] = mat[j][i];
-        }
-    }
-    return mat_t;
-}
-
-u_int32_t* transpose_matrix_integer(u_int32_t* mat, int n){
+u_int64_t* transpose_matrix_integer(u_int64_t* mat, int n){
     /* Transpose a matrix */
-    u_int32_t* mat_t = zero_matrix_1D_integer(n);
+    u_int64_t* mat_t = zero_matrix_1D_integer(n);
     if (mat_t == NULL){
         printf("Cannot transpose the matrix !\n");
     }
@@ -197,6 +182,7 @@ u_int32_t* transpose_matrix_integer(u_int32_t* mat, int n){
     }
     return mat_t;
 }
+
 
 void print_matrix_2D(double** mat, int n){
     /* Print the matrix. Here is an example:
@@ -241,7 +227,8 @@ void print_matrix_1D(double* mat, int n){
     return ;
 }
 
-void print_matrix_1D_integer(u_int32_t* mat, int n){
+
+void print_matrix_1D_integer(u_int64_t* mat, int n){
     /* Print the matrix. Here is an example:
     [ 1 2 3 ]
     [ 4 5 6 ]
@@ -255,16 +242,13 @@ void print_matrix_1D_integer(u_int32_t* mat, int n){
         if (i % n == 0){
             printf("[ ");
         }
-        printf("%d ", mat[i]);
+        printf("%ld ", mat[i]);
         if ((i+1) % n == 0){
             printf("]\n");
         }
     }
     return ;
 }
-
-
-
 
 
 void write_matrix(double** mat, int n, char* filename){
@@ -292,6 +276,7 @@ void write_matrix(double** mat, int n, char* filename){
     return;
 }
 
+
 void write_matrix_1D(double* mat, int n, char* filename){
     /* Write the matrix into a file. Here is an example:
     2
@@ -304,7 +289,8 @@ void write_matrix_1D(double* mat, int n, char* filename){
     return;
 }
 
-void write_matrix_1D_integer(u_int32_t* mat, int n, char* filename){
+
+void write_matrix_1D_integer(u_int64_t* mat, int n, char* filename){
     /* Write the matrix into a file. Here is an example:
     2
     [ 1 2 ]
@@ -320,7 +306,7 @@ void write_matrix_1D_integer(u_int32_t* mat, int n, char* filename){
     for (int i = 0; i < n; i++){
             fprintf(f, "[ ");
         for(int j = 0; j < n; j++){
-            fprintf(f, "%d ", mat[i*n + j]);
+            fprintf(f, "%ld ", mat[i*n + j]);
         }
         fprintf(f, "]\n");
     }
@@ -328,6 +314,7 @@ void write_matrix_1D_integer(u_int32_t* mat, int n, char* filename){
     fclose(f);
     return;
 }
+
 
 double** read_matrix(char* filename, int* n){
     /* Read the file, update n, then return the matrix. */
@@ -370,6 +357,7 @@ double** read_matrix(char* filename, int* n){
     fclose(f);
     return mat;
 }
+
 
 double* read_matrix_1D(char* filename, int* n){
     double** mat = read_matrix(filename, n);
@@ -433,7 +421,7 @@ int equals_matrix_1D_1D(double* A, double* B, int n){
     return 1;
 }
 
-int equals_matrix_float_integer(double* A, u_int32_t* B, int n){
+int equals_matrix_float_integer(double* A, u_int64_t* B, int n){
     /* Check if A equals B. The return values are:
     0: different
     1: equals
@@ -441,18 +429,18 @@ int equals_matrix_float_integer(double* A, u_int32_t* B, int n){
     for (int i=0; i<n*n; i++){
         if (A[i] != B[i]){
             printf("A[%d] = %f \n", i, A[i]);
-            printf("B[%d] = %d \n", i, B[i]);
+            printf("B[%d] = %ld \n", i, B[i]);
             return 0;
         }
     }
     return 1;
 }
 
-int equals_matrix_integer_integer(u_int32_t* A, u_int32_t* B, int n){
+int equals_matrix_integer_integer(u_int64_t* A, u_int64_t* B, int n){
     for (int i=0; i<n*n; i++){
         if (A[i] != B[i]){
-            printf("A[%d] = %d \n", i, A[i]);
-            printf("B[%d] = %d \n", i, B[i]);
+            printf("A[%d] = %ld \n", i, A[i]);
+            printf("B[%d] = %ld \n", i, B[i]);
             return 0;
         }
     }

@@ -425,7 +425,8 @@ void mp_kji(double* A, double* B, double* C, int n){
     }
 }
 
-void mp_integer(u_int32_t* A, u_int32_t* B, u_int32_t* C, int n, u_int32_t p, u_int32_t u){
+
+void mp_integer(u_int64_t* A, u_int64_t* B, u_int64_t* C, int n, u_int32_t p, u_int32_t u){
     /* Matrix product using: Decomp Barrett and Trans */
 
     for (int i = 0; i < n; i++){
@@ -433,9 +434,9 @@ void mp_integer(u_int32_t* A, u_int32_t* B, u_int32_t* C, int n, u_int32_t p, u_
             u_int64_t h = 0;
             u_int64_t l = 0;
             for (int k = 0; k < n; k++){
-                u_int64_t temp = (u_int64_t) A[i*n + k] * B[j*n + k];
-                h += temp >> 32;
-                l += temp - ((temp >> 32) << 32);
+                u_int64_t temp = A[i*n + k] * B[j*n + k];
+                h = h + (temp >> 32);
+                l += temp - (((temp) >> 32) << 32);
             }
 
             u_int64_t t = 1;

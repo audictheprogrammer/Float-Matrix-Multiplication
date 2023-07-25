@@ -518,6 +518,9 @@ int main(){
     // clean_file_blocks_MP();
     // benchmark_blocks_MP(p, u_overline);
 
+    // clean_file_float_integer();
+    // benchmark_float_integer(p, u_overline, u_b);
+
 
     return 0;
 }

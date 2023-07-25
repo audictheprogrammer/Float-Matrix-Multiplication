@@ -43,6 +43,6 @@ void mp_ikj(double* A, double* B, double* C, int n);
 void mp_jik(double* A, double* B, double* C, int n);
 void mp_kji(double* A, double* B, double* C, int n);
 
-void mp_integer(u_int32_t* A, u_int32_t* B, u_int32_t* C, int n, u_int32_t p, u_int32_t u);
-void mp_integer_naive(u_int32_t* A, u_int32_t* B, u_int32_t* C, int n, u_int32_t p, u_int32_t u);
+void mp_integer(u_int64_t* A, u_int64_t* B, u_int64_t* C, int n, u_int32_t p, u_int32_t u);
+
 #endif
