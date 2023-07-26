@@ -39,14 +39,11 @@ double modulo_SIMD3(double a, double p, double u){
     return d + p * (d<0);
 }
 
-u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u){
+u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u, u_int32_t s, u_int32_t t){
     /* Barrett's modular function for integers.
-    Hypothesis: nonnegative numbers, and no assumption on p.
+    Hypothesis: 0 <= a < 2^{32+bitsize_p}, and no assumption on p.
     Returns a % p
     */
-    // Constants works only for p < 2^26
-    u_int32_t s = 22;
-    u_int32_t t = 32;
 
     u_int64_t b = a >> s;
     u_int64_t c = (b * u) >> t; // u = 2^(s+t) / p
@@ -54,6 +51,33 @@ u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u){
     u_int32_t res = a - c * p;
 
     if (res >= p) return res - p;
+    return res;
+}
+
+
+int get_bitsize(double p){
+    /* Get the bitsize of p.
+    Bitsize < 26 because we work with doubles and product.
+    */
+    double MAX = pow(2, 26);
+
+    for (int i = 26; i > 0; i--){
+        if (p > MAX){
+            return i+1;  // res = 2^i forall i
+        }
+        MAX /= 2;
+    }
+    return 0;
+}
+
+int get_blocksize(int b, int n){
+    // b: bitsize of p
+    // n: size of matrix
+    int max_bitsize_double = 53;
+    int res = (int) pow(2, max_bitsize_double - 2*b);
+    if (res > n){
+        return n;
+    }
     return res;
 }
 
@@ -136,12 +160,12 @@ void mp_SIMD3(double* A, double* B, double* C, int n, double p, double u){
 }
 
 
-void mp_Barrett(double* A, double* B, double* C, int n, double p, u_int32_t u){
+void mp_Barrett(double* A, double* B, double* C, int n, double p, u_int32_t u, u_int32_t s, u_int32_t t){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
         for (int i=0; i<n; i++){
             for (int j=0; j<n; j++){
-                double temp = modulo_Barrett(A[i*n + k] * B[k*n + j], p, u);
+                double temp = modulo_Barrett(A[i*n + k] * B[k*n + j], p, u, s, t);
                 C[i*n + j] += temp;
             }
         }
@@ -149,7 +173,7 @@ void mp_Barrett(double* A, double* B, double* C, int n, double p, u_int32_t u){
 
     for (int i=0; i<n; i++){
         for (int j=0; j<n; j++){
-            C[i*n + j] = modulo_Barrett(C[i*n + j], p, u);
+            C[i*n + j] = modulo_Barrett(C[i*n + j], p, u, s, t);
         }
     }
 
@@ -239,13 +263,13 @@ void mp_SIMD3_MP(double* A, double* B, double* C, int n, double p, double u){
 }
 
 
-void mp_Barrett_MP(double* A, double* B, double* C, int n, double p, u_int32_t u){
+void mp_Barrett_MP(double* A, double* B, double* C, int n, double p, u_int32_t u, u_int32_t s, u_int32_t t){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
         for (int i=0; i<n; i++){
             #pragma omp parallel for
             for (int j=0; j<n; j++){
-                C[i*n + j] = C[i*n + j] + modulo_Barrett(A[i*n + k] * B[k*n + j], p, u);
+                C[i*n + j] = C[i*n + j] + modulo_Barrett(A[i*n + k] * B[k*n + j], p, u, s, t);
             }
         }
     }
@@ -253,7 +277,7 @@ void mp_Barrett_MP(double* A, double* B, double* C, int n, double p, u_int32_t u
     for (int i=0; i<n; i++){
         #pragma omp parallel for
         for (int j=0; j<n; j++){
-            C[i*n + j] = modulo_Barrett(C[i*n + j], p, u);
+            C[i*n + j] = modulo_Barrett(C[i*n + j], p, u, s, t);
         }
     }
 
@@ -263,7 +287,7 @@ void mp_Barrett_MP(double* A, double* B, double* C, int n, double p, u_int32_t u
 
 void mp_block(double* A, double* B, double* C, int n, double p, double u, int b){
     /* Compute the product of two matrices using basic block product.
-    It allows to reduce the amount of modulo needed.
+    It allows us to reduce the amount of modulo needed.
     */
 
     for (int k=0; k<n; k+=b){
@@ -286,7 +310,7 @@ void mp_block(double* A, double* B, double* C, int n, double p, double u, int b)
 
 void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, int b){
     /* Compute the product of two matrices using OpenBLAS's block product.
-    It allows to reduce the amount of modulo needed.
+    It allows us to reduce the amount of modulo needed.
     */
     printf("blocksize = %d \n", b);
     openblas_set_num_threads(1);  // 8 is slower than 1.
@@ -323,31 +347,6 @@ void mp_block_BLAS_MP(double* A, double* B, double* C, int n, double p, double u
 }
 
 
-int get_bitsize(double p){
-    /* Get the bitsize of p.
-    Bitsize < 26 because we work with doubles and product.
-    */
-    double MAX = pow(2, 26);
-
-    for (int i = 26; i > 0; i--){
-        if (p > MAX){
-            return i+1;  // res = 2^i forall i
-        }
-        MAX /= 2;
-    }
-    return 0;
-}
-
-int get_blocksize(int b, int n){
-    // b: bitsize of p
-    // n: size of matrix
-    int max_bitsize_double = 53;
-    int res = (int) pow(2, max_bitsize_double - 2*b);
-    if (res > n){
-        return n;
-    }
-    return res;
-}
 
 
 // Comparing loop order. IKJ wins.
@@ -426,25 +425,38 @@ void mp_kji(double* A, double* B, double* C, int n){
 }
 
 
-void mp_integer(u_int64_t* A, u_int64_t* B, u_int64_t* C, int n, u_int32_t p, u_int32_t u){
-    /* Matrix product using: Decomp Barrett and Trans */
-
+void mp_integer(u_int64_t* A, u_int64_t* B, u_int64_t* C, int n, u_int32_t p, u_int32_t u, u_int32_t s, u_int32_t t){
+    /* Matrix product for Integers. */
     for (int i = 0; i < n; i++){
         for (int j = 0; j < n; j++){
             u_int64_t h = 0;
             u_int64_t l = 0;
             for (int k = 0; k < n; k++){
                 u_int64_t temp = A[i*n + k] * B[j*n + k];
-                h = h + (temp >> 32);
+                h += temp >> 32;
                 l += temp - (((temp) >> 32) << 32);
             }
-
-            u_int64_t t = 1;
-            u_int64_t h_rem = modulo_Barrett(h, p, u);
-            u_int64_t l_rem = modulo_Barrett(l, p, u);
-            C[i*n + j] = modulo_Barrett(h_rem * (t << 32) + l_rem, p, u);
+            u_int64_t o = 1;
+            u_int64_t h_rem = modulo_Barrett(h, p, u, s, t);
+            u_int64_t l_rem = modulo_Barrett(l, p, u, s, t);
+            C[i*n + j] = modulo_Barrett(h_rem * (o << 32) + l_rem, p, u, s, t);
 
         }
+    }
+
+}
+
+void mp_float(double* A, double* B, double* C, int n, double p, double u, int b){
+    /* Matrix product for Floats using: 1 thread only. */
+    for (int k=0; k<n; k+=b){
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
+                    n, n, b, 1, A + k, n, B + n*k, n,
+                    1, C, n);
+
+        for (int i=0; i<n*n; i++){
+            C[i] = modulo_SIMD3(C[i], p, u);
+        }
+
     }
 
 }

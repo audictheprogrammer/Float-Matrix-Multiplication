@@ -37,28 +37,44 @@ int main(int argc, char** argv){
 
     if (TEST1){
         // Testing modular functions
-        double p = pow(2, 26) - 5;
+        // Barrett works with these 5 p. Test passed.
+
+        // double p = pow(2, 26) - 5;
+        // double p = pow(2, 24) - 3;
+        // double p = pow(2, 22) - 3;
+        double p = pow(2, 20) - 3;
+        // double p = pow(2, 18) - 5;
+
 
         // Precomputed constants for Modular functions
         double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
         fesetround(FE_TONEAREST);
-        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
+        // Constants for Barrett which is the integer version of SIMD
+        u_int32_t t = 32;
+        u_int32_t s = 30 + get_bitsize(p) - t;
+        u_int32_t u_b = (int) (pow(2, s+t) / p);
 
-        double a = 150007655597277077;
+        printf("s = %d, t = %d \n", s, t);
+        double A[5];
+        A[0] = 150007655597277077;  // 2pow58 bitsize(p) >= 26
+        A[1] = 58528953432971872;  // 2pow56 bitsize(p) >= 24
+        A[2] = 10490987492010470;  // 2pow54 bitsize(p) >= 22
+        A[3] = 3088868763674166;  // 2pow52 bitsize(p) >= 20
+        A[4] = 613220816403662;  // 2pow50 bitsize(p) >= 18
 
-        double SIMD1 = modulo_SIMD1(a, p, u);
-        double SIMD2 = modulo_SIMD2(a, p, u_overline);
-        double SIMD3 = modulo_SIMD3(a, p, u_overline);
-        double Barrett = modulo_Barrett(a, p, u_b);
-
-        printf("a = %f \n", a);
-        printf("p = %f \n", p);
-        printf("SIMD1 returns:%f \n", SIMD1);
-        printf("SIMD2 returns:%f \n", SIMD2);
-        printf("SIMD3 returns:%f \n", SIMD3);
-        printf("Barrett returns:%f \n\n", Barrett);
+        for (int i=0; i<5; i++){
+            double SIMD1 = modulo_SIMD1(A[i], p, u);
+            double SIMD2 = modulo_SIMD2(A[i], p, u_overline);
+            double SIMD3 = modulo_SIMD3(A[i], p, u_overline);
+            double Barrett = modulo_Barrett(A[i], p, u_b, s, t);
+            printf("%f%%%f \n", A[i], p);
+            printf("SIMD1 returns: %f \n", SIMD1);
+            printf("SIMD2 returns: %f \n", SIMD2);
+            printf("SIMD3 returns: %f \n", SIMD3);
+            printf("Barrett returns: %f \n\n", Barrett);
+        }
 
     }
 
@@ -71,14 +87,17 @@ int main(int argc, char** argv){
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
         fesetround(FE_TONEAREST);
-        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
+        // Constants for Barrett which is the integer version of SIMD
+        u_int32_t t = 32;
+        u_int32_t s = 30 + get_bitsize(p) - t;
+        u_int32_t u_b = (int) (pow(2, s+t) / p);
 
         double a = (p-1) * (p-1) * 32;
 
         double SIMD1 = modulo_SIMD1(a, p, u);
         double SIMD2 = modulo_SIMD2(a, p, u_overline);
         double SIMD3 = modulo_SIMD3(a, p, u_overline);
-        double Barrett = modulo_Barrett(a, p, u_b);
+        double Barrett = modulo_Barrett(a, p, u_b, s, t);
 
         printf("a = (p-1)(p-1) + 2^5 \n");
         printf("p = 2^26 - 5 \n");
@@ -99,14 +118,17 @@ int main(int argc, char** argv){
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
         fesetround(FE_TONEAREST);
-        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
+        // Constants for Barrett which is the integer version of SIMD
+        u_int32_t t = 32;
+        u_int32_t s = 30 + get_bitsize(p) - t;
+        u_int32_t u_b = (int) (pow(2, s+t) / p);
 
         double a = (p-1) * (p-1) * 16;  // a > 2^(25+25+4) = 2^54
 
         double SIMD1 = modulo_SIMD1(a, p, u);
         double SIMD2 = modulo_SIMD2(a, p, u);
         double SIMD3 = modulo_SIMD3(a, p, u);
-        double Barrett = modulo_Barrett(a, p, u_b);
+        double Barrett = modulo_Barrett(a, p, u_b, s, t);
 
         printf("a = (p-1)(p-1)* 2^4 \n");
         printf("p = 2^26 - 5 \n");
@@ -124,12 +146,14 @@ int main(int argc, char** argv){
         double p = pow(2, 26) - 5;
 
         // Precomputed constants for Modular functions
-        fesetround(FE_TONEAREST);
         double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
-        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
         fesetround(FE_TONEAREST);
+        // Constants for Barrett which is the integer version of SIMD
+        u_int32_t t = 32;
+        u_int32_t s = 30 + get_bitsize(p) - t;
+        u_int32_t u_b = (int) (pow(2, s+t) / p);
 
         int n = 1;
 
@@ -148,7 +172,7 @@ int main(int argc, char** argv){
             mp_SIMD1(A, B, D, n, p, u);
             mp_SIMD2(A, B, E, n, p, u_overline);
             mp_SIMD3(A, B, F, n, p, u_overline);
-            mp_Barrett(A, B, G, n, p, u_b);
+            mp_Barrett(A, B, G, n, p, u_b, s, t);
 
 
             write_matrix_1D(A, n, "data/Matrix_A.txt");
@@ -209,7 +233,7 @@ int main(int argc, char** argv){
     }
 
     if (TEST6){
-        // Testing OpenBLAS's mp and my mp.
+        // Testing OpenBLAS's mp.
         srand(time(NULL));
         double p = pow(2, 26) - 5;
         int bitsize_p = 26;
@@ -390,7 +414,10 @@ int main(int argc, char** argv){
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
         fesetround(FE_TONEAREST);
-        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
+        // Constants for Barrett which is the integer version of SIMD
+        u_int32_t t = 32;
+        u_int32_t s = 30 + get_bitsize(p) - t;
+        u_int32_t u_b = (int) (pow(2, s+t) / p);
 
         int n = 128;
 
@@ -409,7 +436,7 @@ int main(int argc, char** argv){
             mp_SIMD1(A, B, D, n, p, u);
             mp_SIMD2_MP(A, B, E, n, p, u_overline);
             mp_SIMD3_MP(A, B, F, n, p, u_overline);
-            mp_Barrett_MP(A, B, G, n, p, u_b);
+            mp_Barrett_MP(A, B, G, n, p, u_b, s, t);
 
 
             write_matrix_1D(A, n, "data/Matrix_A.txt");
@@ -445,17 +472,30 @@ int main(int argc, char** argv){
     }
 
     if (TEST11){
-        // Test for integer matrix product
+        // Testing integer mp and float mp.
+
         srand(time(NULL));
-        double p = pow(2, 26) - 5;
+        // double p = pow(2, 26) - 5;
+        // double p = pow(2, 24) - 3;
+        // double p = pow(2, 22) - 3;
+        // double p = pow(2, 20) - 3;
+        double p = pow(2, 18) - 5;
 
         // Precomputed constants for Modular functions
+        double u = 1.0 / p;  // Constant for SIMD
         fesetround(FE_UPWARD);
         double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
         fesetround(FE_TONEAREST);
-        u_int32_t u_b = (int) (pow(2, 54) / p);  // Constant for Barrett
+        // Constants for Barrett which is the integer version of SIMD
+        u_int32_t t = 32;
+        u_int32_t s = 30 + get_bitsize(p) - t;
+        u_int32_t u_b = (int) (pow(2, s+t) / p);
 
-        int n = 128;
+        printf("s = %d, t = %d \n", s, t);
+
+        openblas_set_num_threads(1);
+
+        int n = 2048;
         int bitsize_p = get_bitsize(p);
         int b = get_blocksize(bitsize_p, n);
 
@@ -470,8 +510,8 @@ int main(int argc, char** argv){
         u_int64_t* D = zero_matrix_1D_integer(n);
 
         // PRODUCT STARTS **********************************
-        mp_naive(A, B, C, n, p);
-        mp_integer(A_int, B_int, D, n, p, u_b);
+        mp_float(A, B, C, n, p, u_overline, b);
+        mp_integer(A_int, B_int, D, n, p, u_b, s, t);
         // PRODUCT ENDS ************************************
 
         // printf("Matrix A: \n");
