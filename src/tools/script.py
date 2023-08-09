@@ -11,7 +11,7 @@ if __name__ == "__main__":
                  "../data/benchmark_integer_22.txt",
                  "../data/benchmark_integer_24.txt",
                  "../data/benchmark_integer_26.txt"]
-    P = [18, 20, 22, 24, 26];
+    P = [2**18-5, 2**20-3, 2**22-3, 2**24-3, 2**26-5];
 
     text1 = str()
     text2 = str()
@@ -22,9 +22,9 @@ if __name__ == "__main__":
             temp = line.split();
             if temp[0] == "4096":
                 if i < 5:
-                    text1 += temp[1] + " " + str(P[i%5]) + "\n"
+                    text1 += str(P[i%5]) + " " + temp[1] + "\n"
                 else:
-                    text2 += temp[1] + " " + str(P[i%5]) + "\n"
+                    text2 += str(P[i%5]) + " " + temp[1] + "\n"
         file.close()
 
     # Float
