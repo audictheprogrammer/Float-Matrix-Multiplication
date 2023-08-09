@@ -305,7 +305,7 @@ void benchmark_loops_order(double p){
     The most efficient one is IKJ.
     */
     int m = 1;  // Executes m times each algo
-    for (int i=8; i<11; i++){
+    for (int i=8; i<12; i++){
         int n = (int) pow(2, i);
         double sum_ijk = 0;
         double sum_kij = 0;
@@ -340,10 +340,10 @@ void benchmark_loops_order(double p){
 
 void benchmark_modulos(double p, double u, double u_overline, double u_b, u_int32_t s, u_int32_t t){
     /* Benchmarking different modulos.
-    The most efficient one SIMD2.
+    The 3 SIMD are the most efficient.
     */
     int m = 1;  // Executes m times each algo
-    for (int i=8; i<11; i++){
+    for (int i=8; i<12; i++){
         int n = (int) pow(2, i);
         double sum_mod_naive = 0;
         double sum_mod_SIMD1 = 0;
@@ -376,10 +376,9 @@ void benchmark_modulos(double p, double u, double u_overline, double u_b, u_int3
 
 void benchmark_modulos_MP(double p, double u, double u_overline, double u_b, u_int32_t s, u_int32_t t){
     /* Benchmarking different modulos.
-    The most efficient one SIMD2.
     */
     int m = 1;  // Executes m times each algo
-    for (int i=8; i<11; i++){
+    for (int i=8; i<12; i++){
         int n = (int) pow(2, i);
 
         double sum_mod_MP_naive = 0;
@@ -416,7 +415,8 @@ void benchmark_blocks(double p, double u_overline){
     /* Benchmarking different modulos.
     */
     int m = 1;  // Executes m times each algo
-    for (int i=8; i<11; i++){
+    openblas_set_num_threads(1);  // 8 is slower than 1.
+    for (int i=8; i<13; i++){
         int n = (int) pow(2, i);
         int b = get_blocksize(get_bitsize(p), n);
 
@@ -444,8 +444,9 @@ void benchmark_blocks(double p, double u_overline){
 void benchmark_blocks_MP(double p, double u_overline){
     /* Benchmarking different modulos.
     */
-    int m = 3;  // Executes m times each algo
-    for (int i=8; i<11; i++){
+    int m = 1;  // Executes m times each algo
+    openblas_set_num_threads(1);
+    for (int i=8; i<13; i++){
         int n = (int) pow(2, i);
         int b = get_blocksize(get_bitsize(p), n);
 
@@ -472,7 +473,7 @@ void benchmark_float_integer(double p, double u_overline, double u_b, u_int32_t 
     */
     int m = 1;  // Executes m times each algo
     openblas_set_num_threads(1);
-    for (int i=8; i<11; i++){
+    for (int i=8; i<13; i++){
         int n = (int) pow(2, i);
         int b = get_blocksize(get_bitsize(p), n);
 
@@ -580,42 +581,45 @@ void clean_file_float_integer(){
 int main(){
     // Initialization
     srand(time(NULL));
-    // double p = pow(2, 26) - 5;
+    double p = pow(2, 26) - 5;
     // double p = pow(2, 24) - 3;
     // double p = pow(2, 22) - 3;
     // double p = pow(2, 20) - 3;
-    double p = pow(2, 18) - 5;
+    // double p = pow(2, 18) - 5;
 
     // Precomputed constants for Modular functions
     double u = 1.0 / p;  // Constant for SIMD
     fesetround(FE_UPWARD);
     double u_overline = 1.0 / p;  // Constant for SIMD2 and SIMD3
     fesetround(FE_TONEAREST);
-    // Constants for Barrett which is the integer version of SIMD
+    // Constants for Barrett reductionm, which is the integer version of SIMD
     u_int32_t t = 32;
     u_int32_t s = 30 + get_bitsize(p) - t;
     u_int32_t u_b = (int) (pow(2, s+t) / p);
 
 
-    // Benchmarking order of loop.
-    // clean_file_loops();
-    // benchmark_loops_order(p);
+    /* Benchmarking the order of loop. */
+    clean_file_loops();
+    benchmark_loops_order(p);
 
-    // Benchmarking different modulos.
-    // clean_file_modulos();
-    // benchmark_modulos(p, u, u_overline, u_b);
+    /* Benchmarking different modulo techniques. */
+    clean_file_modulos();
+    benchmark_modulos(p, u, u_overline, u_b, s, t);
 
-    // Benchmarking different modulos with OpenMP
-    // clean_file_modulos_MP();
-    // benchmark_modulos_MP(p, u, u_overline, u_b);
+    /* Benchmarking parallelism apporach with previous modulo techniques. */
+    clean_file_modulos_MP();
+    benchmark_modulos_MP(p, u, u_overline, u_b, s, t);
 
-    // Benchmarking blocks.
-    // clean_file_blocks();
-    // benchmark_blocks(p, u_overline);
+    /* Benchmarking block product approach. */
+    clean_file_blocks();
+    benchmark_blocks(p, u_overline);
 
-    // clean_file_blocks_MP();
-    // benchmark_blocks_MP(p, u_overline);
+    /* Benchmarking the final mixed implementation. */
+    clean_file_blocks_MP();
+    benchmark_blocks_MP(p, u_overline);
 
+    /* Benchmarking the progress made during this internship and work completed
+    last year, using the same environment: 1 thread only, same A, B and p. */
     clean_file_float_integer();
     double P[5];
     P[0] = pow(2, 26) - 5;

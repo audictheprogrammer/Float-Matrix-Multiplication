@@ -98,8 +98,6 @@ void mp_naive(double* A, double* B, double* C, int n, double p){
         }
     }
 
-
-
 }
 
 void mp_SIMD1(double* A, double* B, double* C, int n, double p, double u){
@@ -178,7 +176,6 @@ void mp_Barrett(double* A, double* B, double* C, int n, double p, u_int32_t u, u
     }
 
 }
-
 
 
 // OpenMP
@@ -289,7 +286,6 @@ void mp_block(double* A, double* B, double* C, int n, double p, double u, int b)
     /* Compute the product of two matrices using basic block product.
     It allows us to reduce the amount of modulo needed.
     */
-
     for (int k=0; k<n; k+=b){
 
         for (int kk=k; kk<k+b; kk++){
@@ -312,8 +308,6 @@ void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, i
     /* Compute the product of two matrices using OpenBLAS's block product.
     It allows us to reduce the amount of modulo needed.
     */
-    printf("blocksize = %d \n", b);
-    openblas_set_num_threads(1);  // 8 is slower than 1.
     for (int k=0; k<n; k+=b){
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     n, n, b, 1, A + k, n, B + n*k, n,
