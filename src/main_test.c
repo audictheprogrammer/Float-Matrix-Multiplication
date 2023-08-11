@@ -475,11 +475,12 @@ int main(int argc, char** argv){
         // Testing integer mp and float mp.
 
         srand(time(NULL));
+        double p = 94906249;  // 2^{26} < p < 2^{26.5}
         // double p = pow(2, 26) - 5;
         // double p = pow(2, 24) - 3;
         // double p = pow(2, 22) - 3;
         // double p = pow(2, 20) - 3;
-        double p = pow(2, 18) - 5;
+        // double p = pow(2, 18) - 5;
 
         // Precomputed constants for Modular functions
         double u = 1.0 / p;  // Constant for SIMD

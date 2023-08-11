@@ -5,6 +5,7 @@ double modulo_naive(double a, double p){
     return (double) ((long) a % (long) p);
 }
 
+
 double modulo_SIMD1(double a, double p, double u){
     /* Function 3.1 from SIMD article for floats.
     Hypothesis: Rounding mode = nearest and p < 2^26.
@@ -17,6 +18,7 @@ double modulo_SIMD1(double a, double p, double u){
     return d;
 }
 
+
 double modulo_SIMD2(double a, double p, double u){
     /* Function 3.1 from SIMD article for floats.
     Hypothesis: Rounding mode = up and p < 2^26.
@@ -28,6 +30,7 @@ double modulo_SIMD2(double a, double p, double u){
     return d;
 }
 
+
 double modulo_SIMD3(double a, double p, double u){
     /* Function 3.1 from SIMD article for floats.
     Hypothesis: Rounding mode = up and p < 2^26.
@@ -38,6 +41,7 @@ double modulo_SIMD3(double a, double p, double u){
     // return d + (-(d<0) & (int64_t) p);
     return d + p * (d<0);
 }
+
 
 u_int32_t modulo_Barrett(u_int64_t a, u_int32_t p, u_int32_t u, u_int32_t s, u_int32_t t){
     /* Barrett's modular function for integers.
@@ -70,6 +74,7 @@ int get_bitsize(double p){
     return 0;
 }
 
+
 int get_blocksize(int b, int n){
     // b: bitsize of p
     // n: size of matrix
@@ -81,7 +86,27 @@ int get_blocksize(int b, int n){
     return res;
 }
 
+
 void mp_naive(double* A, double* B, double* C, int n, double p){
+    // Assert C is a zero matrix.
+    for (int i=0; i<n; i++){
+        for (int j=0; j<n; j++){
+            for (int k=0; k<n; k++){
+                double temp = modulo_naive(A[i*n + k] * B[k*n + j], p);
+                C[i*n + j] += temp;
+            }
+        }
+    }
+
+    for (int i=0; i<n; i++){
+        for (int j=0; j<n; j++){
+            C[i*n + j] = modulo_naive(C[i*n + j], p);
+        }
+    }
+
+}
+
+void mp_naive_KIJ(double* A, double* B, double* C, int n, double p){
     // Assert C is a zero matrix.
     for (int k=0; k<n; k++){
         for (int i=0; i<n; i++){
@@ -119,6 +144,7 @@ void mp_SIMD1(double* A, double* B, double* C, int n, double p, double u){
 
 }
 
+
 void mp_SIMD2(double* A, double* B, double* C, int n, double p, double u){
     // Assert C is a zero matrix
     for (int k=0; k<n; k++){
@@ -137,6 +163,7 @@ void mp_SIMD2(double* A, double* B, double* C, int n, double p, double u){
     }
 
 }
+
 
 void mp_SIMD3(double* A, double* B, double* C, int n, double p, double u){
     // Assert C is a zero matrix
@@ -281,7 +308,6 @@ void mp_Barrett_MP(double* A, double* B, double* C, int n, double p, u_int32_t u
 }
 
 
-
 void mp_block(double* A, double* B, double* C, int n, double p, double u, int b){
     /* Compute the product of two matrices using basic block product.
     It allows us to reduce the amount of modulo needed.
@@ -304,6 +330,7 @@ void mp_block(double* A, double* B, double* C, int n, double p, double u, int b)
 
 }
 
+
 void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, int b){
     /* Compute the product of two matrices using OpenBLAS's block product.
     It allows us to reduce the amount of modulo needed.
@@ -321,6 +348,7 @@ void mp_block_BLAS(double* A, double* B, double* C, int n, double p, double u, i
     }
 
 }
+
 
 void mp_block_BLAS_MP(double* A, double* B, double* C, int n, double p, double u, int b){
     /* Compute the product of two matrices using OpenBLAS's block product.
@@ -344,7 +372,6 @@ void mp_block_BLAS_MP(double* A, double* B, double* C, int n, double p, double u
 
 
 // Comparing loop order. IKJ wins.
-
 // Loop 1
 void mp_ijk(double* A, double* B, double* C, int n){
     // Assert C is a zero matrix

@@ -18,6 +18,7 @@ int get_bitsize(double p);
 int get_blocksize(int b, int n);
 
 void mp_naive(double* A, double* B, double* C, int n, double p);
+void mp_naive_KIJ(double* A, double* B, double* C, int n, double p);
 void mp_SIMD1(double* A, double* B, double* C, int n, double p, double u);
 void mp_SIMD2(double* A, double* B, double* C, int n, double p, double u);
 void mp_SIMD3(double* A, double* B, double* C, int n, double p, double u);

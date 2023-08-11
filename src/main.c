@@ -84,6 +84,17 @@ double benchmark_mod_naive(double* A, double* B, int n, double p){
     return ((double) (final - initial)) / CLOCKS_PER_SEC;
 }
 
+double benchmark_mod_naive_KIJ(double* A, double* B, int n, double p){
+    double* C = zero_matrix_1D(n);
+
+    clock_t initial = clock();
+    mp_naive(A, B, C, n, p);
+    clock_t final = clock();
+
+    delete_matrix_1D(&C, n);
+    return ((double) (final - initial)) / CLOCKS_PER_SEC;
+}
+
 double benchmark_mod_SIMD1(double* A, double* B, int n, double p, double u){
     double* C = zero_matrix_1D(n);
 
@@ -346,6 +357,7 @@ void benchmark_modulos(double p, double u, double u_overline, double u_b, u_int3
     for (int i=8; i<12; i++){
         int n = (int) pow(2, i);
         double sum_mod_naive = 0;
+        double sum_mod_naive_KIJ = 0;
         double sum_mod_SIMD1 = 0;
         double sum_mod_SIMD2 = 0;
         double sum_mod_SIMD3 = 0;
@@ -355,6 +367,7 @@ void benchmark_modulos(double p, double u, double u_overline, double u_b, u_int3
             double* A = random_matrix_1D(n, p);
             double* B = random_matrix_1D(n, p);
             sum_mod_naive += benchmark_mod_naive(A, B, n, p);
+            sum_mod_naive_KIJ += benchmark_mod_naive_KIJ(A, B, n, p);
             sum_mod_SIMD1 += benchmark_mod_SIMD1(A, B, n, p, u);
             sum_mod_SIMD2 += benchmark_mod_SIMD2(A, B, n, p, u_overline);
             sum_mod_SIMD3 += benchmark_mod_SIMD3(A, B, n, p, u_overline);
@@ -366,6 +379,7 @@ void benchmark_modulos(double p, double u, double u_overline, double u_b, u_int3
 
         printf("\n");
         write_benchmark_time("data/benchmark_modulo_naive.txt", "Mod Naive", n, sum_mod_naive/m);
+        write_benchmark_time("data/benchmark_modulo_naive_KIJ.txt", "Mod Naive KIJ", n, sum_mod_naive_KIJ/m);
         write_benchmark_time("data/benchmark_modulo_SIMD1.txt", "Mod SIMD1", n, sum_mod_SIMD1/m);
         write_benchmark_time("data/benchmark_modulo_SIMD2.txt", "Mod SIMD2", n, sum_mod_SIMD2/m);
         write_benchmark_time("data/benchmark_modulo_SIMD3.txt", "Mod SIMD3", n, sum_mod_SIMD3/m);
@@ -445,17 +459,20 @@ void benchmark_blocks_MP(double p, double u_overline){
     /* Benchmarking different modulos.
     */
     int m = 1;  // Executes m times each algo
-    openblas_set_num_threads(1);
     for (int i=8; i<13; i++){
         int n = (int) pow(2, i);
         int b = get_blocksize(get_bitsize(p), n);
 
         double sum_blocks_BLAS_MP = 0;
+        double sum_blocks_BLAS_MP_4 = 0;
 
         for (int j=0; j<m; j++){
             double* A = random_matrix_1D(n, p);
             double* B = random_matrix_1D(n, p);
+            openblas_set_num_threads(1);
             sum_blocks_BLAS_MP += benchmark_blocks_BLAS_MP(A, B, n, p, u_overline, b);
+            openblas_set_num_threads(4);
+            sum_blocks_BLAS_MP_4 += benchmark_blocks_BLAS_MP(A, B, n, p, u_overline, b);
 
             delete_matrix_1D(&A, n);
             delete_matrix_1D(&B, n);
@@ -522,11 +539,11 @@ void clean_file_loops(){
 }
 
 void clean_file_modulos(){
-    char noms[5][64] = {"data/benchmark_modulo_naive.txt", "data/benchmark_modulo_SIMD1.txt",\
-     "data/benchmark_modulo_SIMD2.txt", "data/benchmark_modulo_SIMD3.txt",
-     "data/benchmark_modulo_Barrett.txt"};
+    char noms[6][64] = {"data/benchmark_modulo_naive.txt", "data/benchmark_modulo_naive_KIJ.txt",\
+     "data/benchmark_modulo_SIMD1.txt", "data/benchmark_modulo_SIMD2.txt",\
+     "data/benchmark_modulo_SIMD3.txt", "data/benchmark_modulo_Barrett.txt"};
 
-    for (int i=0; i<5; i++){
+    for (int i=0; i<6; i++){
         FILE* f = fopen(noms[i], "w");
         fclose(f);
     }
@@ -554,9 +571,9 @@ void clean_file_blocks(){
 }
 
 void clean_file_blocks_MP(){
-    char noms[1][64] = {"data/benchmark_blocks_BLAS_MP.txt"};
+    char noms[2][64] = {"data/benchmark_blocks_BLAS_MP.txt", "data/benchmark_blocks_BLAS_MP_4.txt"};
 
-    for (int i=0; i<1; i++){
+    for (int i=0; i<2; i++){
         FILE *f = fopen(noms[i], "w");
         fclose(f);
     }
