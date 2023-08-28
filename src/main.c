@@ -88,7 +88,7 @@ double benchmark_mod_naive_KIJ(double* A, double* B, int n, double p){
     double* C = zero_matrix_1D(n);
 
     clock_t initial = clock();
-    mp_naive(A, B, C, n, p);
+    mp_naive_KIJ(A, B, C, n, p);
     clock_t final = clock();
 
     delete_matrix_1D(&C, n);
@@ -195,7 +195,7 @@ double benchmark_mod_MP_SIMD2(double* A, double* B, int n, double p, double u){
      double elapsed;
 
      clock_gettime(CLOCK_MONOTONIC, &initial);
-     mp_SIMD2_MP(A, B, C, n, p, u);
+     mp_SIMD3_MP(A, B, C, n, p, u);
      clock_gettime(CLOCK_MONOTONIC, &final);
 
      elapsed = (final.tv_sec - initial.tv_sec);
