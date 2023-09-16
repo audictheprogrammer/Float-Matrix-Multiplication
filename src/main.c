@@ -615,21 +615,21 @@ int main(){
     u_int32_t u_b = (int) (pow(2, s+t) / p);
 
 
-    /* Benchmarking the order of loop. */
-    clean_file_loops();
-    benchmark_loops_order(p);
-
-    /* Benchmarking different modulo techniques. */
-    clean_file_modulos();
-    benchmark_modulos(p, u, u_overline, u_b, s, t);
+    // /* Benchmarking the order of loop. */
+    // clean_file_loops();
+    // benchmark_loops_order(p);
+    //
+    // /* Benchmarking different modulo techniques. */
+    // clean_file_modulos();
+    // benchmark_modulos(p, u, u_overline, u_b, s, t);
 
     /* Benchmarking parallelism apporach with previous modulo techniques. */
     clean_file_modulos_MP();
     benchmark_modulos_MP(p, u, u_overline, u_b, s, t);
 
     /* Benchmarking block product approach. */
-    clean_file_blocks();
-    benchmark_blocks(p, u_overline);
+    // clean_file_blocks();
+    // benchmark_blocks(p, u_overline);
 
     /* Benchmarking the final mixed implementation. */
     clean_file_blocks_MP();
@@ -637,16 +637,16 @@ int main(){
 
     /* Benchmarking the progress made during this internship and work completed
     last year, using the same environment: 1 thread only, same A, B and p. */
-    clean_file_float_integer();
-    double P[5];
-    P[0] = pow(2, 26) - 5;
-    P[1] = pow(2, 24) - 3;
-    P[2] = pow(2, 22) - 3;
-    P[3] = pow(2, 20) - 3;
-    P[4] = pow(2, 18) - 5;
-    for (int i=0; i<5; i++){
-        benchmark_float_integer(P[i], u_overline, u_b, s, t);;
-    }
+    // clean_file_float_integer();
+    // double P[5];
+    // P[0] = pow(2, 26) - 5;
+    // P[1] = pow(2, 24) - 3;
+    // P[2] = pow(2, 22) - 3;
+    // P[3] = pow(2, 20) - 3;
+    // P[4] = pow(2, 18) - 5;
+    // for (int i=0; i<5; i++){
+    //     benchmark_float_integer(P[i], u_overline, u_b, s, t);;
+    // }
 
 
     return 0;

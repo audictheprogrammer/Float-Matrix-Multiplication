@@ -30,8 +30,8 @@ int main(int argc, char** argv){
     const int TEST6 = 0;
     const int TEST7 = 0;
     const int TEST8 = 0;
-    const int TEST9 = 0;
-    const int TEST10 = 0;
+    const int TEST9 = 1;
+    const int TEST10 = 1;
     const int TEST11 = 1;
 
 
@@ -475,8 +475,8 @@ int main(int argc, char** argv){
         // Testing integer mp and float mp.
 
         srand(time(NULL));
-        double p = 94906249;  // 2^{26} < p < 2^{26.5}
-        // double p = pow(2, 26) - 5;
+        // double p = 94906249;  // 2^{26} < p < 2^{26.5}, please set b = 1
+        double p = pow(2, 26) - 5;
         // double p = pow(2, 24) - 3;
         // double p = pow(2, 22) - 3;
         // double p = pow(2, 20) - 3;
@@ -496,7 +496,7 @@ int main(int argc, char** argv){
 
         openblas_set_num_threads(1);
 
-        int n = 2048;
+        int n = 512;
         int bitsize_p = get_bitsize(p);
         int b = get_blocksize(bitsize_p, n);
 
